@@ -2,6 +2,7 @@ package com.solvd.micro9.users.web.controller;
 
 import com.solvd.micro9.users.domain.User;
 import com.solvd.micro9.users.service.UserService;
+import com.solvd.micro9.users.web.controller.exception.ServiceIsNotAvailableException;
 import com.solvd.micro9.users.web.dto.EventDto;
 import com.solvd.micro9.users.web.dto.UserDto;
 import com.solvd.micro9.users.web.mapper.UserMapper;
@@ -23,7 +24,7 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
     private final RestTemplate restTemplate;
-    private static final String URL = "http://localhost:9090/api/v1/events";
+    private static final String URL = "http://TICKET-SERVICE/api/v1/events";
     private static final String USER_SERVICE = "user-service";
 
     @GetMapping
@@ -46,7 +47,7 @@ public class UserController {
     }
 
     private EventDto[] sendError(Exception ex){
-        throw new RuntimeException();
+        throw new ServiceIsNotAvailableException("Sorry, we have some issues :(");
     }
 
 }
