@@ -1,0 +1,16 @@
+spring:
+  config:
+    import: .env[.properties]
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_DOMAIN}:5432/postgres?currentSchema=users
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+  jackson:
+    default-property-inclusion: non_null
+  liquibase:
+    change-log: classpath:db.changelog/db.changelog-master.yaml
+    default-schema: users
