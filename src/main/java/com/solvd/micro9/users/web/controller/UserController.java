@@ -5,6 +5,7 @@ import com.solvd.micro9.users.service.UserService;
 import com.solvd.micro9.users.web.dto.EventDto;
 import com.solvd.micro9.users.web.dto.UserDto;
 import com.solvd.micro9.users.web.mapper.UserMapper;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ public class UserController {
     private final UserMapper userMapper;
     private final RestTemplate restTemplate;
     private static final String URL = "http://localhost:9090/api/v1/events";
+    private static final String USER_SERVICE = "user-service";
 
     @GetMapping
     public List<UserDto> getAll() {
@@ -37,9 +39,14 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/events")
+    @CircuitBreaker(name = USER_SERVICE, fallbackMethod = "sendError")
     public EventDto[] findEventsByUserId(@PathVariable(name = "id") Long userId) {
         String url = URL + "/" + userId;
         return restTemplate.getForObject(url, EventDto[].class);
+    }
+
+    private EventDto[] sendError(Exception ex){
+        throw new RuntimeException();
     }
 
 }
