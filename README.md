@@ -5,22 +5,9 @@ A simple sample of microservice on spring-boot.
 
 User service provides endpoints to receive **data related to users**.<br/>
 
-It is connected with another microservice via **service registry pattern**. The Service Registry is a database for microservice instances. 
-When the client service need to access internal services, then it will query from Service Registry and access them.
-Here implementation is done via Netflix Eureka.
+This microservice is connected with another microservice via ***service registry pattern***. A key advantage of a microservices architecture is the ability to create new instances of each service to meet the current load, respond to failures and roll out upgrades. One side effect of this dynamic server-side environment is that IP address and port of a service instances change constantly. In order to route an API request to a particular service, the client or API gateway needs to find out the address of the service instance it should use. Whereas in the past it might have been feasible to record these locations in a config file, in a dynamic environment where instances are added and removed on the fly, an automated solution is needed. Service discovery provides a mechanism for keeping track of the available instances and distributing requests across them.
 
-<p align="center">
-  <img src="http://1.bp.blogspot.com/-dXDcC3rnVeU/V7J79R5XxII/AAAAAAAADOQ/K53Ebgvj0uweGLXDeVKanQa3uFxxxRCvwCK4B/s1600/img.png" width="420" height="270">
-</p>
-
-**Circuite breaker pattern** is also implemented there. The basic idea behind the circuit breaker is very simple. 
-You wrap a protected function call in a circuit breaker object, which monitors for failures. 
-Once the failures reach a certain threshold, the circuit breaker trips, and all further calls to the circuit breaker return with an error, 
-without the protected call being made at all. Usually you'll also want some kind of monitor alert if the circuit breaker trips.
-
-<p align="center">
-  <img src="https://martinfowler.com/bliki/images/circuitBreaker/state.png" width="270" height="250">
-</p>
+***Circuite breaker pattern*** is also implemented there. Use of the Circuit Breaker pattern can allow a microservice to continue operating when a related service fails, preventing the failure from cascading and giving the failing service time to recover. You wrap a protected function call in a circuit breaker object, which monitors for failures. Once the failures reach a certain threshold, the circuit breaker trips, and all further calls to the circuit breaker return with an error, without the protected call being made at all. 
 
 ## Installation
 
