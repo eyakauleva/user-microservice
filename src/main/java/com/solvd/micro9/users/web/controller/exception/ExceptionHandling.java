@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionHandling {
 
-    @ExceptionHandler(Throwable.class)
+    @ExceptionHandler(ServiceIsNotAvailableException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionBody handleAnyException(Throwable throwable) {
-        return new ExceptionBody("Internal server error");
+    public ExceptionBody handleServiceIsNotAvailableException(ServiceIsNotAvailableException ex) {
+        return new ExceptionBody(ex.getMessage());
     }
 
 }
