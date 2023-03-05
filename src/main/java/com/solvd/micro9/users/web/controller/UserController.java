@@ -22,7 +22,7 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
     private final RestTemplate restTemplate;
-    private static final String URL = "http://localhost:9090/api/v1/events";
+    private static final String URL = "http://TICKET-SERVICE/api/v1/events";
 
     @GetMapping
     public List<UserDto> getAll() {

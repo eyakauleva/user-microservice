@@ -14,3 +14,12 @@ spring:
   liquibase:
     change-log: classpath:db.changelog/db.changelog-master.yaml
     default-schema: users
+  application:
+    name: USER-SERVICE
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_DEFAULT_ZONE}
