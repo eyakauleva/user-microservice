@@ -1,6 +1,3 @@
---liquibase formatted sql
-
---changeset eyakauleva:create_tables
 
 create table users
 (
@@ -10,5 +7,3 @@ create table users
 	email varchar(100) not null,
 	primary key (id)
 );
-
---rollback drop table users;

@@ -1,24 +1,13 @@
 package com.solvd.micro9.users.service;
 
 import com.solvd.micro9.users.domain.User;
-import com.solvd.micro9.users.persistence.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
+public interface UserService {
 
-@Service
-@RequiredArgsConstructor
-public class UserService {
+    Flux<User> getAll();
 
-    private final UserRepository userRepository;
-
-    public List<User> getAll() {
-        return userRepository.findAll();
-    }
-
-    public User findById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User [id=" + id + "] does not exist"));
-    }
+    Mono<User> findById(Long id);
 
 }
