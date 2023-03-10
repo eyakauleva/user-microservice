@@ -1,11 +1,12 @@
 package com.solvd.micro9.users.domain;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Entity
 @Table(name = "users")
 @Data
 @NoArgsConstructor
@@ -13,13 +14,12 @@ import lombok.NoArgsConstructor;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "first_name")
+    @Column("first_name")
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column("last_name")
     private String lastName;
 
     private String email;
