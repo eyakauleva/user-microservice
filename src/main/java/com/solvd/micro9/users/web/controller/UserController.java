@@ -1,7 +1,10 @@
 package com.solvd.micro9.users.web.controller;
 
+import com.google.gson.Gson;
 import com.solvd.micro9.users.domain.User;
 import com.solvd.micro9.users.service.UserService;
+import com.solvd.micro9.users.web.controller.exception.BadRequestException;
+import com.solvd.micro9.users.web.controller.exception.ExceptionBody;
 import com.solvd.micro9.users.web.controller.exception.ServiceIsNotAvailableException;
 import com.solvd.micro9.users.web.dto.EventDto;
 import com.solvd.micro9.users.web.dto.TicketDto;
@@ -9,11 +12,10 @@ import com.solvd.micro9.users.web.dto.UserDto;
 import com.solvd.micro9.users.web.mapper.UserMapper;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -44,36 +46,47 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/events")
-    @CircuitBreaker(name = USER_SERVICE, fallbackMethod = "circuitBreakerFallbackMethod")
-    public ResponseEntity<Flux<EventDto>> findEventsByUserId(@PathVariable(name = "id") Long userId) {
+    @CircuitBreaker(name = USER_SERVICE, fallbackMethod = "fluxCircuitBreakerFallback")
+    public Flux<EventDto> findEventsByUserId(@PathVariable(name = "id") Long userId) {
         String url = FIND_EVENTS_BY_USER_ID_URL + "/" + userId;
-        Flux<EventDto> eventDtoFlux = webClientBuilder.build()
+        return webClientBuilder.build()
                 .get()
                 .uri(url)
                 .retrieve()
                 .bodyToFlux(EventDto.class);
-        return new ResponseEntity<>(eventDtoFlux, HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/{id}/tickets")
-    @CircuitBreaker(name = USER_SERVICE, fallbackMethod = "circuitBreakerFallbackMethod")
-    public ResponseEntity<Mono<TicketDto>> createTicket(@PathVariable(name = "id") Long userId, @RequestBody TicketDto ticketDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    @CircuitBreaker(name = USER_SERVICE, fallbackMethod = "monoCircuitBreakerFallback")
+    public Mono<TicketDto> createTicket(@PathVariable(name = "id") Long userId, @RequestBody TicketDto ticketDto) {
         ticketDto.setUserId(userId);
-        Mono<TicketDto> ticketDtoMono = webClientBuilder.build()
+        return webClientBuilder.build()
                 .post()
                 .uri(CREATE_TICKET_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(ticketDto), TicketDto.class)
                 .retrieve()
+                .onStatus(
+                        status -> status.equals(HttpStatus.BAD_REQUEST),
+                        (ex) ->
+                                ex.bodyToMono(String.class)
+                                        .handle(
+                                                (body, handler) -> {
+                                                    Gson gson = new Gson();
+                                                    ExceptionBody exceptionBody = gson.fromJson(body, ExceptionBody.class);
+                                                    handler.error(new BadRequestException(exceptionBody));
+                                                }))
                 .bodyToMono(TicketDto.class);
-        return new ResponseEntity<>(ticketDtoMono, HttpStatus.CREATED);
     }
 
-    private ResponseEntity<Void> circuitBreakerFallbackMethod(HttpClientErrorException ex) {
-        throw ex;
+    @SneakyThrows
+    private Mono<?> monoCircuitBreakerFallback(Exception ex) {
+        if (ex instanceof BadRequestException) throw ex;
+        else throw new ServiceIsNotAvailableException("Sorry, we have some issues :(");
     }
 
-    private ResponseEntity<Void> circuitBreakerFallbackMethod(Exception ex) {
+    private Flux<?> fluxCircuitBreakerFallback(Exception ex) {
         throw new ServiceIsNotAvailableException("Sorry, we have some issues :(");
     }
 
