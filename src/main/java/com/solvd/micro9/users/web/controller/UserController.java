@@ -2,8 +2,6 @@ package com.solvd.micro9.users.web.controller;
 
 import com.google.gson.Gson;
 import com.solvd.micro9.users.domain.User;
-import com.solvd.micro9.users.messaging.KfConsumer;
-import com.solvd.micro9.users.messaging.KfProducer;
 import com.solvd.micro9.users.service.UserService;
 import com.solvd.micro9.users.web.controller.exception.BadRequestException;
 import com.solvd.micro9.users.web.controller.exception.ExceptionBody;
@@ -34,21 +32,6 @@ public class UserController {
     private static final String FIND_EVENTS_BY_USER_ID_URL = "http://" + TICKET_SERVICE + "/api/v1/events/user/";
     private static final String CREATE_TICKET_URL = "http://" + TICKET_SERVICE + "/api/v1/tickets";
     private static final String USER_SERVICE = "user-service";
-
-    private final KfProducer producer;
-    private final KfConsumer consumer;
-
-    @GetMapping(value = "/check")
-    public String check(@RequestBody TicketDto ticketDto) {
-        String value = String.valueOf(System.currentTimeMillis());
-        String key = new Object(){}.getClass().getEnclosingMethod().getName();
-        ticketDto.setId(System.currentTimeMillis());
-        producer.send(key, value);
-        return value;
-//        consumer.fetch();
-//        return consumer.getValue();
-        //return Mono.just(this.consumer.getValue());
-    }
 
     @GetMapping
     public Flux<UserDto> getAll() {
@@ -95,6 +78,11 @@ public class UserController {
                                                     handler.error(new BadRequestException(exceptionBody));
                                                 }))
                 .bodyToMono(TicketDto.class);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public Mono<Void> delete(@PathVariable("id") Long id) {
+        return userService.delete(id);
     }
 
     @SneakyThrows
