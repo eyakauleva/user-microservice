@@ -10,6 +10,31 @@ spring:
     default-property-inclusion: non_null
   application:
     name: USER-SERVICE
+  kafka:
+    bootstrap-servers: localhost:9092
+    properties:
+      spring:
+        json:
+          trusted:
+            packages: com.solvd.micro9.users.web.dto
+    producer:
+#      properties:
+#        enable:
+#          idempotence: true
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+#      properties:
+#        max:
+#          poll:
+#            interval:
+#              ms: 100000
+#
+#      max-poll-records: 20
+#      auto-offset-reset: latest
+      group-id: myGroup
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 eureka:
   client:
