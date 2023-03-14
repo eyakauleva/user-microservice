@@ -1,6 +1,7 @@
 package com.solvd.micro9.users.messaging;
 
 import org.apache.kafka.clients.admin.NewTopic;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,11 +14,20 @@ import java.util.Map;
 @Configuration
 public class KfProducerConfig {
 
+    @Value("${spring.kafka.topic}")
+    private String topic;
+
+    @Value("${spring.kafka.partitions}")
+    private int partitionCount;
+
+    @Value("${spring.kafka.replicas}")
+    private int replicaCount;
+
     @Bean
     public NewTopic topic() {
-        return TopicBuilder.name("users")
-                .partitions(3)
-                .replicas(1)
+        return TopicBuilder.name(topic)
+                .partitions(partitionCount)
+                .replicas(replicaCount)
                 .build();
     }
 
