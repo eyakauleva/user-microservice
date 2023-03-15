@@ -14,7 +14,7 @@ spring:
     topic: users
     partitions: 3
     replicas: 1
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}:9092
     properties:
       spring:
         json:
