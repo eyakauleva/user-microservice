@@ -80,6 +80,11 @@ public class UserController {
                 .bodyToMono(TicketDto.class);
     }
 
+    @DeleteMapping(value = "/{id}")
+    public Mono<Void> delete(@PathVariable("id") Long id) {
+        return userService.delete(id);
+    }
+
     @SneakyThrows
     private Mono<?> monoCircuitBreakerFallback(Exception ex) {
         if (ex instanceof BadRequestException) throw ex;
