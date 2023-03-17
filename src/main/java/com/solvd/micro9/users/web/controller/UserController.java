@@ -13,6 +13,7 @@ import com.solvd.micro9.users.web.mapper.UserMapper;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -25,12 +26,13 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UserController {
 
-    public static final String TICKET_SERVICE = "TICKET-SERVICE";
+    @Value("${ticket-service}")
+    public static String ticketService;
     private final UserService userService;
     private final UserMapper userMapper;
     private final WebClient.Builder webClientBuilder;
-    private static final String FIND_EVENTS_BY_USER_ID_URL = "http://" + TICKET_SERVICE + "/api/v1/events/user/";
-    private static final String CREATE_TICKET_URL = "http://" + TICKET_SERVICE + "/api/v1/tickets";
+    private static final String FIND_EVENTS_BY_USER_ID_URL = "http://" + ticketService + "/api/v1/events/user/";
+    private static final String CREATE_TICKET_URL = "http://" + ticketService + "/api/v1/tickets";
     private static final String USER_SERVICE = "user-service";
 
     @GetMapping
