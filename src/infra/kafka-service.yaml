@@ -8,4 +8,3 @@ spec:
   ports:
     - port: 9092
       targetPort: 9092
-  type: LoadBalancer
