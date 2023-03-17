@@ -1,4 +1,4 @@
-ticket-service: ${TICKET_SERVICE_URL}
+ticket-service: ${TICKET_SERVICE_DOMAIN}:9090
 
 spring:
   config:
