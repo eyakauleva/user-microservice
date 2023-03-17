@@ -1,6 +1,6 @@
 spring:
   config:
-    import: .env[.properties]
+    import: optional:file:.env[.properties]
   r2dbc:
     url: r2dbc:postgresql://${POSTGRES_DOMAIN}:5432/postgres?currentSchema=users
     username: ${POSTGRES_USER}
