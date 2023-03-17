@@ -27,12 +27,11 @@ import reactor.core.publisher.Mono;
 public class UserController {
 
     @Value("${ticket-service}")
-    public static String ticketService;
+    private String ticketService;
+
     private final UserService userService;
     private final UserMapper userMapper;
     private final WebClient.Builder webClientBuilder;
-    private static final String FIND_EVENTS_BY_USER_ID_URL = "http://" + ticketService + "/api/v1/events/user/";
-    private static final String CREATE_TICKET_URL = "http://" + ticketService + "/api/v1/tickets";
     private static final String USER_SERVICE = "user-service";
 
     @GetMapping
@@ -50,7 +49,7 @@ public class UserController {
     @GetMapping(value = "/{id}/events")
     @CircuitBreaker(name = USER_SERVICE, fallbackMethod = "fluxCircuitBreakerFallback")
     public Flux<EventDto> findEventsByUserId(@PathVariable(name = "id") Long userId) {
-        String url = FIND_EVENTS_BY_USER_ID_URL + "/" + userId;
+        String url = "http://" + ticketService + "/api/v1/events/user/" + userId;
         return webClientBuilder.build()
                 .get()
                 .uri(url)
@@ -62,10 +61,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @CircuitBreaker(name = USER_SERVICE, fallbackMethod = "monoCircuitBreakerFallback")
     public Mono<TicketDto> createTicket(@PathVariable(name = "id") Long userId, @RequestBody TicketDto ticketDto) {
+        String url = "http://" + ticketService + "/api/v1/tickets";
         ticketDto.setUserId(userId);
         return webClientBuilder.build()
                 .post()
-                .uri(CREATE_TICKET_URL)
+                .uri(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(ticketDto), TicketDto.class)
                 .retrieve()
