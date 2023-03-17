@@ -27,12 +27,12 @@ spec:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: pg-secrets
+                  name: pg-secrets-users
                   key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: pg-secrets
+                  name: pg-secrets-users
                   key: POSTGRES_PASSWORD
             - name: KAFKA_BOOTSTRAP_SERVERS
               valueFrom:
