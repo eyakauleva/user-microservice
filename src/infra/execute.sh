@@ -14,4 +14,4 @@ kubectl apply -f app-configmap.yaml
 kubectl apply -f app-service.yaml
 kubectl apply -f app-deployment.yaml
 
-#minikube service lawoffice
+#minikube service user-service
