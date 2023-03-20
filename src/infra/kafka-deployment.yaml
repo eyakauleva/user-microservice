@@ -24,3 +24,5 @@ spec:
               value: PLAINTEXT:PLAINTEXT
             - name: KAFKA_ADVERTISED_LISTENERS
               value: PLAINTEXT://kafka-service:9092
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: '1'
