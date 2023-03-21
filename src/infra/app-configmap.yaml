@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-configmap
+data:
+  POSTGRES_DOMAIN: pg-service-users
+  KAFKA_BOOTSTRAP_SERVERS: kafka-service
+  TICKET_SERVICE_DOMAIN: ticket-service

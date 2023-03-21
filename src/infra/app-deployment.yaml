@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user
+  template:
+    metadata:
+      labels:
+        app: user
+    spec:
+      containers:
+        - name: user-app
+          image: eyakauleva/user-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: POSTGRES_DOMAIN
+              valueFrom:
+                configMapKeyRef:
+                  name: user-configmap
+                  key: POSTGRES_DOMAIN
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secrets-users
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secrets-users
+                  key: POSTGRES_PASSWORD
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: user-configmap
+                  key: KAFKA_BOOTSTRAP_SERVERS
+            - name: TICKET_SERVICE_DOMAIN
+              valueFrom:
+                configMapKeyRef:
+                  name: user-configmap
+                  key: TICKET_SERVICE_DOMAIN
