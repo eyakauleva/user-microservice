@@ -13,6 +13,7 @@ import com.solvd.micro9.users.web.mapper.UserMapper;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,6 +25,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
     @Value("${ticket-service}")
@@ -89,11 +91,13 @@ public class UserController {
 
     @SneakyThrows
     private Mono<?> monoCircuitBreakerFallback(Exception ex) {
+        log.error("error: ", ex);
         if (ex instanceof BadRequestException) throw ex;
         else throw new ServiceIsNotAvailableException("Sorry, we have some issues :(");
     }
 
     private Flux<?> fluxCircuitBreakerFallback(Exception ex) {
+        log.error("error: ", ex);
         throw new ServiceIsNotAvailableException("Sorry, we have some issues :(");
     }
 
