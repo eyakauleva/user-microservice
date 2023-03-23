@@ -5,4 +5,4 @@ metadata:
 data:
   POSTGRES_DOMAIN: pg-service-users
   KAFKA_BOOTSTRAP_SERVERS: kafka-service
-  TICKET_SERVICE_DOMAIN: ticket-service
+  TICKET_SERVICE_DOMAIN: tickets-service
