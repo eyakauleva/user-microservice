@@ -5,30 +5,72 @@ import com.solvd.micro9.users.domain.exception.ResourceDoesNotExistException;
 import com.solvd.micro9.users.messaging.KfProducer;
 import com.solvd.micro9.users.persistence.UserRepository;
 import com.solvd.micro9.users.service.UserService;
-import lombok.RequiredArgsConstructor;
+import jakarta.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ReactiveHashOperations;
+import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 @Service
-@RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final KfProducer producer;
+    private final ReactiveHashOperations<String, Long, User> cache;
+    private final String cacheKey = "users";
+    private boolean areAllUsersInCache = false;
+
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository,
+                           KfProducer producer,
+                           final ReactiveRedisOperations<String, User> operations) {
+        this.userRepository = userRepository;
+        this.producer = producer;
+        this.cache = operations.opsForHash();
+    }
 
     public Flux<User> getAll() {
-        return userRepository.findAll();
+        if (areAllUsersInCache) {
+            return cache.entries(cacheKey)
+                    .map(Map.Entry::getValue);
+        } else {
+            areAllUsersInCache = true;
+            return userRepository.findAll()
+                    .doOnNext(user -> cache.put(cacheKey, user.getId(), user).subscribe());
+        }
     }
 
     public Mono<User> findById(Long id) {
-        return userRepository.findById(id)
-                .switchIfEmpty(Mono.error(new ResourceDoesNotExistException("User [id=" + id + "] does not exist")));
+        cache.remove(cacheKey, 8L);
+        return cache.get(cacheKey, id)
+                .switchIfEmpty(Mono.defer(() -> getFromDatabaseAddToCache(id)));
     }
 
     public Mono<Void> delete(Long id) {
-        return userRepository.deleteById(id)
-                .doOnSuccess(i -> producer.send("Deleted user's id", id));
+        return cache.remove(cacheKey, id)
+                .flatMap(returnedId -> userRepository.deleteById(id))
+                .doOnSuccess(i -> {
+                    producer.send("Deleted user's id", id);
+                    cache.remove(cacheKey, id);
+                });
+    }
+
+    private Mono<User> getFromDatabaseAddToCache(Long id) {
+        return userRepository.findById(id)
+                .switchIfEmpty(Mono.error(new ResourceDoesNotExistException("User [id=" + id + "] does not exist")))
+                .flatMap(user -> cache.put(cacheKey, id, user)
+                        .thenReturn(user));
+    }
+
+    @PreDestroy
+    private void cleanCache() {
+        cache.delete(cacheKey).block();
     }
 
 }

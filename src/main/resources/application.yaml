@@ -10,6 +10,11 @@ spring:
     driver: org.postgresql.Driver
   jackson:
     default-property-inclusion: non_null
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+      password: ${REDIS_PASSWORD}
   application:
     name: USER-SERVICE
   kafka:
