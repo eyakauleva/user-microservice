@@ -44,3 +44,13 @@ spec:
                 configMapKeyRef:
                   name: user-configmap
                   key: TICKET_SERVICE_DOMAIN
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: user-configmap
+                  key: REDIS_HOST
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secrets
+                  key: REDIS_PASSWORD

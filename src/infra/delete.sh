@@ -10,6 +10,10 @@ kubectl delete deployment.apps/user-deploy
 kubectl delete service/user-service
 kubectl delete configmap user-configmap
 
+kubectl delete statefulset.apps/redis-stateful
+kubectl delete service/redis-service
+kubectl delete secret redis-secrets
+
 kubectl delete statefulset.apps/pg-stateful-users
 kubectl delete service/pg-service-users
 kubectl delete secret pg-secrets-users
