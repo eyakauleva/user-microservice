@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.Map;
 
@@ -42,14 +43,16 @@ public class UserServiceImpl implements UserService {
         } else {
             areAllUsersInCache = true;
             return userRepository.findAll()
-                    .doOnNext(user -> cache.put(cacheKey, user.getId(), user).subscribe());
+                    .doOnNext(user -> cache.put(cacheKey, user.getId(), user)
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .subscribe());
         }
     }
 
     public Mono<User> findById(Long id) {
         cache.remove(cacheKey, 8L);
         return cache.get(cacheKey, id)
-                .switchIfEmpty(Mono.defer(() -> getFromDatabaseAddToCache(id)));
+                .switchIfEmpty(Mono.defer(() -> fromDbToCache(id)));
     }
 
     public Mono<Void> delete(Long id) {
@@ -61,7 +64,7 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
-    private Mono<User> getFromDatabaseAddToCache(Long id) {
+    private Mono<User> fromDbToCache(Long id) {
         return userRepository.findById(id)
                 .switchIfEmpty(Mono.error(new ResourceDoesNotExistException("User [id=" + id + "] does not exist")))
                 .flatMap(user -> cache.put(cacheKey, id, user)
