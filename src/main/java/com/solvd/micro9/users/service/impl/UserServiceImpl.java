@@ -66,7 +66,11 @@ public class UserServiceImpl implements UserService {
 
     private Mono<User> fromDbToCache(Long id) {
         return userRepository.findById(id)
-                .switchIfEmpty(Mono.error(new ResourceDoesNotExistException("User [id=" + id + "] does not exist")))
+                .switchIfEmpty(Mono
+                        .error(
+                                new ResourceDoesNotExistException("User [id=" + id + "] does not exist")
+                        )
+                )
                 .flatMap(user -> cache.put(cacheKey, id, user)
                         .thenReturn(user));
     }
