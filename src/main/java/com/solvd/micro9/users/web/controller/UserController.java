@@ -16,6 +16,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -80,6 +81,12 @@ public class UserController {
                                                     handler.error(new BadRequestException(exceptionBody));
                                                 }))
                 .bodyToMono(TicketDto.class);
+    }
+
+    @PostMapping
+    public Mono<User> create(@RequestBody @Validated UserDto userDto){
+        User user = userMapper.dtoToDomain(userDto);
+        return userService.create(user);
     }
 
     @DeleteMapping(value = "/{id}")

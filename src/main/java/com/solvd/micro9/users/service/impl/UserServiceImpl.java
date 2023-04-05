@@ -55,6 +55,11 @@ public class UserServiceImpl implements UserService {
                 .switchIfEmpty(Mono.defer(() -> fromDbToCache(id)));
     }
 
+    @Override
+    public Mono<User> create(User user) {
+        return userRepository.save(user);
+    }
+
     public Mono<Void> delete(Long id) {
         return cache.remove(cacheKey, id)
                 .flatMap(returnedId -> userRepository.deleteById(id))

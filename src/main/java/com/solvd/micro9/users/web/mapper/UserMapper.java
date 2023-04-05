@@ -19,4 +19,6 @@ public interface UserMapper {
         return userFlux.map(this::domainToDto);
     }
 
+    User dtoToDomain(UserDto userDto);
+
 }
