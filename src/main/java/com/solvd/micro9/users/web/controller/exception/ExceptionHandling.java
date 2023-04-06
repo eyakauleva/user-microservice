@@ -23,7 +23,8 @@ public class ExceptionHandling {
                 .stream()
                 .map(fieldError ->
                         new BindingError(
-                                fieldError.getObjectName() + "." + ((FieldError) fieldError).getField(), fieldError.getDefaultMessage()))
+                                fieldError.getObjectName() + "." + ((FieldError) fieldError).getField(),
+                                fieldError.getDefaultMessage()))
                 .collect(Collectors.toList());
         return Mono.just(new ExceptionBody("Binding errors", bindingErrors));
     }

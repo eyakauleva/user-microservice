@@ -8,7 +8,6 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-//@Table(name = "users")
 @Document(collection = "users")
 @Data
 @NoArgsConstructor
