@@ -50,9 +50,16 @@ public class UserServiceImpl implements UserService {
     }
 
     public Mono<User> findById(Long id) {
-        cache.remove(cacheKey, 8L);
         return cache.get(cacheKey, id)
                 .switchIfEmpty(Mono.defer(() -> fromDbToCache(id)));
+    }
+
+    @Override
+    public Mono<User> create(User user) {
+        return userRepository.save(user)
+                .doOnNext(createdUser -> cache.put(cacheKey, user.getId(), user)
+                        .subscribeOn(Schedulers.boundedElastic())
+                        .subscribe());
     }
 
     public Mono<Void> delete(Long id) {

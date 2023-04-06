@@ -4,22 +4,26 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-@Table(name = "users")
+@Document(collection = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
 
+    @Transient
+    public static final String SEQUENCE_NAME = "users_sequence";
+
     @Id
     private Long id;
 
-    @Column("first_name")
+    @Field("first_name")
     private String firstName;
 
-    @Column("last_name")
+    @Field("last_name")
     private String lastName;
 
     private String email;

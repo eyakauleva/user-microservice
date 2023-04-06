@@ -10,6 +10,8 @@ public interface UserService {
 
     Mono<User> findById(Long id);
 
+    Mono<User> create(User user);
+
     Mono<Void> delete(Long id);
 
 }
