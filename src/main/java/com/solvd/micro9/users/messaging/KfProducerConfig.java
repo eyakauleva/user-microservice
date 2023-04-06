@@ -1,5 +1,6 @@
 package com.solvd.micro9.users.messaging;
 
+import com.solvd.micro9.users.domain.es.Es;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
@@ -32,7 +33,7 @@ public class KfProducerConfig {
     }
 
     @Bean
-    public ReactiveKafkaProducerTemplate<String, Long> producer(KafkaProperties properties) {
+    public ReactiveKafkaProducerTemplate<String, Es> producer(KafkaProperties properties) {
         Map<String, Object> props = properties.buildProducerProperties();
         return new ReactiveKafkaProducerTemplate<>(SenderOptions.create(props));
     }

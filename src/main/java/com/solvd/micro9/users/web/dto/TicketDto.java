@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class TicketDto {
 
-    private Long id;
-    private Long userId;
+    private String id;
+    private String userId;
     private EventDto event;
     private Integer quantity;
     private BigDecimal price;

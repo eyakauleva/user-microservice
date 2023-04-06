@@ -1,11 +1,17 @@
 package com.solvd.micro9.users.web.controller;
 
 import com.google.gson.Gson;
-import com.solvd.micro9.users.domain.User;
-import com.solvd.micro9.users.service.UserService;
+import com.solvd.micro9.users.domain.aggregate.User;
+import com.solvd.micro9.users.domain.command.CreateUserCommand;
+import com.solvd.micro9.users.domain.command.DeleteUserCommand;
+import com.solvd.micro9.users.domain.es.EsUser;
+import com.solvd.micro9.users.domain.query.EsUserQuery;
+import com.solvd.micro9.users.service.EsUserCommandHandler;
+import com.solvd.micro9.users.service.UserQueryHandler;
 import com.solvd.micro9.users.web.controller.exception.BadRequestException;
 import com.solvd.micro9.users.web.controller.exception.ExceptionBody;
 import com.solvd.micro9.users.web.controller.exception.ServiceIsNotAvailableException;
+import com.solvd.micro9.users.web.dto.EsDto;
 import com.solvd.micro9.users.web.dto.EventDto;
 import com.solvd.micro9.users.web.dto.TicketDto;
 import com.solvd.micro9.users.web.dto.UserDto;
@@ -30,26 +36,28 @@ public class UserController {
     @Value("${ticket-service}")
     private String ticketService;
 
-    private final UserService userService;
+    private final EsUserCommandHandler commandHandler;
+    private final UserQueryHandler queryHandler;
     private final UserMapper userMapper;
     private final WebClient.Builder webClientBuilder;
     private static final String USER_SERVICE = "user-service";
 
     @GetMapping
     public Flux<UserDto> getAll() {
-        Flux<User> users = userService.getAll();
+        Flux<User> users = queryHandler.getAll();
         return userMapper.domainToDto(users);
     }
 
     @GetMapping(value = "/{id}")
-    public Mono<UserDto> findByUserId(@PathVariable(name = "id") Long userId) {
-        Mono<User> user = userService.findById(userId);
+    public Mono<UserDto> findByUserId(@PathVariable(name = "id") String userId) {
+        EsUserQuery query = new EsUserQuery(userId);
+        Mono<User> user = queryHandler.findById(query);
         return userMapper.domainToDto(user);
     }
 
     @GetMapping(value = "/{id}/events")
     @CircuitBreaker(name = USER_SERVICE, fallbackMethod = "fluxCircuitBreakerFallback")
-    public Flux<EventDto> findEventsByUserId(@PathVariable(name = "id") Long userId) {
+    public Flux<EventDto> findEventsByUserId(@PathVariable(name = "id") String userId) {
         String url = "http://" + ticketService + "/api/v1/events/user/" + userId;
         return webClientBuilder.build()
                 .get()
@@ -61,7 +69,7 @@ public class UserController {
     @PostMapping(value = "/{id}/tickets")
     @ResponseStatus(HttpStatus.CREATED)
     @CircuitBreaker(name = USER_SERVICE, fallbackMethod = "monoCircuitBreakerFallback")
-    public Mono<TicketDto> createTicket(@PathVariable(name = "id") Long userId, @RequestBody TicketDto ticketDto) {
+    public Mono<EsDto> createTicket(@PathVariable(name = "id") String userId, @RequestBody TicketDto ticketDto) {
         String url = "http://" + ticketService + "/api/v1/tickets";
         ticketDto.setUserId(userId);
         return webClientBuilder.build()
@@ -76,22 +84,23 @@ public class UserController {
                                 ex.bodyToMono(String.class)
                                         .handle(
                                                 (body, handler) -> {
-                                                    Gson gson = new Gson();
-                                                    ExceptionBody exceptionBody = gson.fromJson(body, ExceptionBody.class);
+                                                    ExceptionBody exceptionBody = new Gson().fromJson(body, ExceptionBody.class);
                                                     handler.error(new BadRequestException(exceptionBody));
                                                 }))
-                .bodyToMono(TicketDto.class);
+                .bodyToMono(EsDto.class);
     }
 
     @PostMapping
-    public Mono<User> create(@RequestBody @Validated UserDto userDto){
+    public Mono<EsUser> create(@RequestBody @Validated UserDto userDto) {
         User user = userMapper.dtoToDomain(userDto);
-        return userService.create(user);
+        CreateUserCommand command = new CreateUserCommand(user, "Liza123");
+        return commandHandler.apply(command);
     }
 
     @DeleteMapping(value = "/{id}")
-    public Mono<Void> delete(@PathVariable("id") Long id) {
-        return userService.delete(id);
+    public Mono<EsUser> delete(@PathVariable("id") String id) {
+        DeleteUserCommand command = new DeleteUserCommand(id, "Liza123");
+        return commandHandler.apply(command);
     }
 
     @SneakyThrows
