@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class KfProducer {
 
-    @Value("${spring.kafka.topic}")
+    @Value("${spring.kafka.producer.topic}")
     private String topic;
 
     private final ReactiveKafkaProducerTemplate<String, Es> producer;

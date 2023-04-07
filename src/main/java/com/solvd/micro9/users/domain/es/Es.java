@@ -2,6 +2,7 @@ package com.solvd.micro9.users.domain.es;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
  */
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class Es {
 

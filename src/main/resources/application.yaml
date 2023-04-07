@@ -15,7 +15,6 @@ spring:
   application:
     name: USER-SERVICE
   kafka:
-    topic: users
     partitions: 3
     replicas: 1
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}:9092
@@ -25,6 +24,7 @@ spring:
           trusted:
             packages: com.solvd.micro9.users.web.dto
     producer:
+      topic: users
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
@@ -33,6 +33,17 @@ spring:
             add:
               type:
                 headers: false
+    consumer:
+      topic: events
+      group-id: userGroup
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            value:
+              default:
+                type: com.solvd.micro9.users.domain.es.Es
 
 management:
   health:

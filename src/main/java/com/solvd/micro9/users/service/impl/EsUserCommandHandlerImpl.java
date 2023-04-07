@@ -2,6 +2,7 @@ package com.solvd.micro9.users.service.impl;
 
 import com.google.gson.Gson;
 import com.solvd.micro9.users.domain.aggregate.User;
+import com.solvd.micro9.users.domain.command.CompleteTransactionCommand;
 import com.solvd.micro9.users.domain.command.CreateUserCommand;
 import com.solvd.micro9.users.domain.command.DeleteUserCommand;
 import com.solvd.micro9.users.domain.es.EsStatus;
@@ -52,6 +53,7 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
                 .createdBy(command.getCommandBy())
                 .entityId(UUID.randomUUID().toString())
                 .payload(payload)
+                .status(EsStatus.SUBMITTED)
                 .build();
         return esUserRepository.save(event)
                 .doOnNext(createdEvent -> {
@@ -75,13 +77,52 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
                 .status(EsStatus.PENDING)
                 .build();
         return esUserRepository.save(event)
-                .doOnNext(createdEvent -> {
-                    producer.send(EsType.USER_DELETED.toString(), createdEvent);
-                    cache.remove(RedisConfig.CACHE_KEY, command.getId())
-                            .subscribeOn(Schedulers.boundedElastic())
-                            .subscribe();
-                    synchronizer.sync(createdEvent);
-                });
+                .doOnNext(createdEvent -> producer.send(EsType.USER_DELETED.toString(), createdEvent));
+    }
+
+    @Override
+    public void apply(CompleteTransactionCommand command) {
+        esUserRepository.findByEntityIdTypeStatus(
+                        command.getUserId(),
+                        EsType.USER_DELETED,
+                        EsStatus.SUBMITTED,
+                        EsStatus.CANCELED
+                )
+                .collectList()
+                .map(resultList -> {
+                    if (resultList.isEmpty()) {
+                        esUserRepository.findByEntityIdTypeStatus(
+                                        command.getUserId(),
+                                        EsType.USER_DELETED,
+                                        EsStatus.PENDING
+                                )
+                                .map(esUser -> {
+                                    EsUser completeEvent = EsUser.builder()
+                                            .type(EsType.USER_DELETED)
+                                            .time(LocalDateTime.now())
+                                            .createdBy(esUser.getCreatedBy())
+                                            .entityId(command.getUserId())
+                                            .status(command.getStatus())
+                                            .build();
+                                    esUserRepository.save(completeEvent)
+                                            .subscribeOn(Schedulers.boundedElastic())
+                                            .subscribe();
+                                    if (EsStatus.SUBMITTED.equals(command.getStatus())) {
+                                        cache.remove(RedisConfig.CACHE_KEY, esUser.getEntityId())
+                                                .subscribeOn(Schedulers.boundedElastic())
+                                                .subscribe();
+                                        synchronizer.sync(completeEvent);
+                                    }
+                                    producer.send(EsType.USER_DELETED.toString(), completeEvent);
+                                    return esUser;
+                                })
+                                .subscribeOn(Schedulers.boundedElastic())
+                                .subscribe();
+                    }
+                    return resultList;
+                })
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe();
     }
 
 }
