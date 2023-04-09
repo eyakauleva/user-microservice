@@ -84,9 +84,7 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
     public void apply(CompleteTransactionCommand command) {
         esUserRepository.findByEntityIdTypeStatus(
                         command.getUserId(),
-                        EsType.USER_DELETED,
-                        EsStatus.SUBMITTED,
-                        EsStatus.CANCELED
+                        EsType.USER_DELETED
                 )
                 .collectList()
                 .map(resultList -> {
