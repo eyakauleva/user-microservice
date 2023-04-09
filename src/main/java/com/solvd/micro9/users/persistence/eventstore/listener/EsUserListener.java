@@ -21,7 +21,9 @@ public class EsUserListener extends AbstractMongoEventListener<EsUser> {
     public void onBeforeConvert(BeforeConvertEvent<EsUser> event) {
         try {
             if (Objects.isNull(event.getSource().getId())) {
-                event.getSource().setId(sequenceGenerator.generateSequence(EsUser.SEQUENCE_NAME));
+                event.getSource().setId(
+                        sequenceGenerator.generateSequence(EsUser.SEQUENCE_NAME)
+                );
             }
         } catch (InterruptedException | ExecutionException e) {
             throw new ServerException(e);
