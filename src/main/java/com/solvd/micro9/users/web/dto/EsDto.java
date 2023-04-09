@@ -14,7 +14,10 @@ public class EsDto {
 
     private String type;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(
+            shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd HH:mm"
+    )
     private LocalDateTime time;
 
     private String createdBy;
