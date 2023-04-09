@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserDto {
 
-    private Long id;
+    private String id;
 
     @NotBlank(message = "User's first name cannot be empty")
     private String firstName;

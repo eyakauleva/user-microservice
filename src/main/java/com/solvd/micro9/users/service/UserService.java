@@ -1,17 +1,13 @@
 package com.solvd.micro9.users.service;
 
-import com.solvd.micro9.users.domain.User;
-import reactor.core.publisher.Flux;
+import com.solvd.micro9.users.domain.aggregate.User;
+import com.solvd.micro9.users.domain.es.Es;
 import reactor.core.publisher.Mono;
 
 public interface UserService {
 
-    Flux<User> getAll();
+    Mono<User> create(Es eventStore);
 
-    Mono<User> findById(Long id);
-
-    Mono<User> create(User user);
-
-    Mono<Void> delete(Long id);
+    Mono<Void> delete(Es eventStore);
 
 }

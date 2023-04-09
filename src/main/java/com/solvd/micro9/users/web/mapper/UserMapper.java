@@ -1,6 +1,6 @@
 package com.solvd.micro9.users.web.mapper;
 
-import com.solvd.micro9.users.domain.User;
+import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.web.dto.UserDto;
 import org.mapstruct.Mapper;
 import reactor.core.publisher.Flux;

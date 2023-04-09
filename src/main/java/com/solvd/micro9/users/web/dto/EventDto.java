@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class EventDto {
 
-    private Long id;
+    private String id;
 
     private String name;
 

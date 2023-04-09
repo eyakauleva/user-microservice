@@ -3,11 +3,6 @@ ticket-service: ${TICKET_SERVICE_DOMAIN}:9090
 spring:
   config:
     import: optional:file:.env[.properties]
-  r2dbc:
-    url: r2dbc:postgresql://${POSTGRES_DOMAIN}:5432/postgres?currentSchema=users
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
-    driver: org.postgresql.Driver
   jackson:
     default-property-inclusion: non_null
   data:
@@ -32,6 +27,12 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring:
+          json:
+            add:
+              type:
+                headers: false
 
 management:
   health:
