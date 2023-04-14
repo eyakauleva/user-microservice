@@ -1,0 +1,13 @@
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: req-auth-jwt
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      auth: jwt
+  jwtRules:
+    - issuer: testing@secure.istio.io
+      jwks: |
+        { "keys":[{"e":"AQAB","kty":"RSA","n":"qdk7FwUexAJuLKAYwvbyoBMqhoGlmSXa8L7xSZkiljHux9GQY0aGpMzMPXlQpSkRDVoJQ_XC1wxtvJvzyjYNW3qRB3gKE6Hd6GawDDv2F6041O1did40PC8vNnQ9qz1UuVPiv4e5oV9jHNVVIcHcaeUAtGzIiW7YBPJqmsu3O7kBkSMTBN5q3bGz-y1VSCA26bQfen3lIy4uY9suq2ySm9oMkT0dM5KYFfpYjge5VTP4biOzQP7RJtm23SVZ_57Y0OCfhR26v0EczdlbDvm36E3ap4cGqmw0X44pYYZydUYhBVOlnvOQc8cFzZfaHUBRFCKNfJORupoKHii-5gjv9w"}]}

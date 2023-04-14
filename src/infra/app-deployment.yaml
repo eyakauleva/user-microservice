@@ -12,6 +12,7 @@ spec:
       labels:
         app: user
         sidecar.istio.io/inject: "true"
+        auth: jwt
     spec:
       containers:
         - name: user-app
