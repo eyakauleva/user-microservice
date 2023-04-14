@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: zookeeper-deploy
+  name: zookeeper-stateful
 spec:
   replicas: 1
   selector:
