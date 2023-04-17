@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: tickets-app
-          image: eyakauleva/ticket-service:latest
+          image: eyakauleva/ticket-service
           imagePullPolicy: Always
           ports:
             - containerPort: 9090
