@@ -15,7 +15,7 @@ import java.util.Map;
 @Configuration
 public class KfProducerConfig {
 
-    @Value("${spring.kafka.topic}")
+    @Value("${spring.kafka.producer.topic}")
     private String topic;
 
     @Value("${spring.kafka.partitions}")
