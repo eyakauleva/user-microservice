@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user
+  template:
+    metadata:
+      labels:
+        app: user
+        sidecar.istio.io/inject: "true"
+        auth: jwt
+    spec:
+      containers:
+        - name: user-app
+          image: eyakauleva/user-service
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MONGODB_DOMAIN
+              valueFrom:
+                configMapKeyRef:
+                  name: user-configmap
+                  key: MONGODB_DOMAIN
+            - name: MONGODB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secrets-common
+                  key: MONGODB_USER
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secrets-common
+                  key: MONGODB_PASSWORD
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: user-configmap
+                  key: KAFKA_BOOTSTRAP_SERVERS
+            - name: TICKET_SERVICE_DOMAIN
+              valueFrom:
+                configMapKeyRef:
+                  name: user-configmap
+                  key: TICKET_SERVICE_DOMAIN
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: user-configmap
+                  key: REDIS_HOST
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secrets
+                  key: REDIS_PASSWORD
+ 
+ 
+ ---
+ 
+ 
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  selector:
+    app: user
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+
+---
+
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-configmap
+data:
+  MONGODB_DOMAIN: mongodb-service-common
+  KAFKA_BOOTSTRAP_SERVERS: kafka-service
+  TICKET_SERVICE_DOMAIN: tickets-service
+  REDIS_HOST: redis-service
