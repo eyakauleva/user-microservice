@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: user-app
-          image: eyakauleva/user-service
+          image: eyakauleva/user-service:<TAG>
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
