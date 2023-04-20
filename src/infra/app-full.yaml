@@ -56,9 +56,9 @@ spec:
                 secretKeyRef:
                   name: redis-secrets
                   key: REDIS_PASSWORD
- 
- 
- ---
+                  
+                  
+---
  
  
 apiVersion: v1
