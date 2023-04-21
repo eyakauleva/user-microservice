@@ -13,6 +13,7 @@ env:
 
 jobs:
   build:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -20,8 +21,15 @@ jobs:
       - name: Log in to Docker.io
         run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: ''
+
       - name: Build Docker image
-        run: docker build . --file Dockerfile --tag $DOCKER_USER/$REPO_NAME:latest
+        run: docker build . --file Dockerfile --tag $DOCKER_USER/$REPO_NAME:${{ steps.tag_version.outputs.new_tag }}
 
       - name: Push image to Docker.io
-        run: docker push $DOCKER_USER/$REPO_NAME:latest
+        run: docker push $DOCKER_USER/$REPO_NAME:${{ steps.tag_version.outputs.new_tag }}

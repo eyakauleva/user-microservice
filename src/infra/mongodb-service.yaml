@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service-common
+spec:
+  selector:
+    app: mongodb-common
+  ports:
+    - port: 27017
+      targetPort: 27017

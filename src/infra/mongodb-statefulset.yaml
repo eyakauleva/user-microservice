@@ -1,42 +1,42 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: pg-stateful-common
+  name: mongodb-stateful-common
 spec:
-  serviceName: pg-service-common
+  serviceName: mongodb-service-common
   replicas: 1
   selector:
     matchLabels:
-      app: postgres-common
+      app: mongodb-common
   template:
     metadata:
       labels:
-        app: postgres-common
+        app: mongodb-common
     spec:
       containers:
-        - name: user-service-postgres
-          image: postgres:14.6-alpine
+        - name: common-service-mongodb
+          image: mongo:6.0.5
           imagePullPolicy: Always
           ports:
-            - containerPort: 5432
+            - containerPort: 27017
           env:
-            - name: POSTGRES_USER
+            - name: MONGO_INITDB_ROOT_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: pg-secrets-common
-                  key: POSTGRES_USER
-            - name: POSTGRES_PASSWORD
+                  name: mongodb-secrets-common
+                  key: MONGODB_USER
+            - name: MONGO_INITDB_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: pg-secrets-common
-                  key: POSTGRES_PASSWORD
+                  name: mongodb-secrets-common
+                  key: MONGODB_PASSWORD
       volumes:
-        - name: postgres-db
+        - name: mongo-db
           hostPath:
             path: /data
   volumeClaimTemplates:
     - metadata:
-        name: postgres-db
+        name: mongo-db
       spec:
         accessModes:
           - "ReadWriteOnce"

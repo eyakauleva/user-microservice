@@ -1,3 +1,4 @@
+
 ticket-service: ${TICKET_SERVICE_DOMAIN}:9090
 
 spring:

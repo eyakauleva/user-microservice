@@ -1,30 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-deploy
+  name: tickets-deploy
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user
+      app: tickets
   template:
     metadata:
       labels:
-        app: user
+        app: tickets
         sidecar.istio.io/inject: "true"
         auth: jwt
     spec:
       containers:
-        - name: user-app
-          image: eyakauleva/user-service:$TAG
+        - name: tickets-app
+          image: eyakauleva/ticket-service
           imagePullPolicy: Always
           ports:
-            - containerPort: 8080
+            - containerPort: 9090
           env:
             - name: MONGODB_DOMAIN
               valueFrom:
                 configMapKeyRef:
-                  name: user-configmap
+                  name: tickets-configmap
                   key: MONGODB_DOMAIN
             - name: MONGODB_USER
               valueFrom:
@@ -39,17 +39,27 @@ spec:
             - name: KAFKA_BOOTSTRAP_SERVERS
               valueFrom:
                 configMapKeyRef:
-                  name: user-configmap
+                  name: tickets-configmap
                   key: KAFKA_BOOTSTRAP_SERVERS
-            - name: TICKET_SERVICE_DOMAIN
+            - name: POSTGRES_DOMAIN
               valueFrom:
                 configMapKeyRef:
-                  name: user-configmap
-                  key: TICKET_SERVICE_DOMAIN
+                  name: tickets-configmap
+                  key: POSTGRES_DOMAIN
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secrets-common
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg-secrets-common
+                  key: POSTGRES_PASSWORD
             - name: REDIS_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: user-configmap
+                  name: tickets-configmap
                   key: REDIS_HOST
             - name: REDIS_PASSWORD
               valueFrom:
