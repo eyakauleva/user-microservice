@@ -21,8 +21,14 @@ jobs:
       - name: Log in to Docker.io
         run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
-      - name: Build Docker image
-        run: docker build . --file Dockerfile --tag $DOCKER_USER/$REPO_NAME:$IMAGE_TAG
+#      - name: Build Docker image
+#        run: docker build . --file Dockerfile --tag $DOCKER_USER/$REPO_NAME:$IMAGE_TAG
+#
+#      - name: Push image to Docker.io
+#        run: docker push $DOCKER_USER/$REPO_NAME:$IMAGE_TAG
 
-      - name: Push image to Docker.io
-        run: docker push $DOCKER_USER/$REPO_NAME:$IMAGE_TAG
+      - name: Bump version and push tag
+        uses: hennejg/github-tag-action@v4.1.jh1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dry_run: true
