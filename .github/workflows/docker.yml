@@ -20,8 +20,13 @@ jobs:
       - name: Log in to Docker.io
         run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
-      - name: Build Docker image
-        run: docker build . --file Dockerfile --tag $DOCKER_USER/$REPO_NAME:latest
+      - name: Checkout latest release tag
+        run: |
+          LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo $LATEST_TAG
 
-      - name: Push image to Docker.io
-        run: docker push $DOCKER_USER/$REPO_NAME:latest
+#      - name: Build Docker image
+#        run: docker build . --file Dockerfile --tag $DOCKER_USER/$REPO_NAME:latest
+#
+#      - name: Push image to Docker.io
+#        run: docker push $DOCKER_USER/$REPO_NAME:latest
