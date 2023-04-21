@@ -21,11 +21,8 @@ jobs:
       - name: Log in to Docker.io
         run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
-      - name: Check tag
-        run: echo $IMAGE_TAG
+      - name: Build Docker image
+        run: docker build . --file Dockerfile --tag $DOCKER_USER/$REPO_NAME:$IMAGE_TAG
 
-#      - name: Build Docker image
-#        run: docker build . --file Dockerfile --tag $DOCKER_USER/$REPO_NAME:$IMAGE_TAG
-#
-#      - name: Push image to Docker.io
-#        run: docker push $DOCKER_USER/$REPO_NAME:$IMAGE_TAG
+      - name: Push image to Docker.io
+        run: docker push $DOCKER_USER/$REPO_NAME:$IMAGE_TAG
