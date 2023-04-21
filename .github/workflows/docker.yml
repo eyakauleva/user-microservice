@@ -10,6 +10,7 @@ env:
   DOCKER_USER: ${{secrets.DOCKER_USER}}
   DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
   REPO_NAME: ${{secrets.REPO_NAME}}
+  IMAGE_TAG: 0.0.${{ github.run_number }}
 
 jobs:
   build:
@@ -20,13 +21,11 @@ jobs:
       - name: Log in to Docker.io
         run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
-      - name: Checkout latest release tag
-        run: |
-          LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
-          echo $LATEST_TAG
+      - name: Check tag
+        run: echo $IMAGE_TAG
 
 #      - name: Build Docker image
-#        run: docker build . --file Dockerfile --tag $DOCKER_USER/$REPO_NAME:latest
+#        run: docker build . --file Dockerfile --tag $DOCKER_USER/$REPO_NAME:$IMAGE_TAG
 #
 #      - name: Push image to Docker.io
-#        run: docker push $DOCKER_USER/$REPO_NAME:latest
+#        run: docker push $DOCKER_USER/$REPO_NAME:$IMAGE_TAG
