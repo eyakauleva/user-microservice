@@ -21,7 +21,7 @@ pipeline {
         stage('Build Docker image') {
             steps {
                 script {
-                    sh 'docker build -t eyakauleva/user-service:${BUILD_NUMBER} .'
+                    sh "docker build -t eyakauleva/user-service:${params.TAG} ."
                 }
             }
         }
@@ -29,15 +29,18 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'DockerHubPwd', variable: 'DockerHubPwd')]) {
                     sh 'docker login -u eyakauleva -p ${DockerHubPwd}'
-                    sh 'docker push eyakauleva/user-service:${BUILD_NUMBER}'
+                    sh "docker push eyakauleva/user-service:${params.TAG}"
                 }
             }
         }
         stage('Deploy to k8s') {
             steps {
                 dir('src/infra') {
-                    sh "sed -i '' 's/<TAG>/${BUILD_NUMBER}/' app-full.yaml"
-                    sh 'kubectl apply -f app-full.yaml'
+                    sh 'kubectl apply -f app-configmap.yaml'
+                    sh 'kubectl apply -f app-service.yaml'
+                    sh "sed -i '' 's/\$TAG/${params.TAG}/' app-deployment.yaml"
+                    sh 'cat app-deployment.yaml'
+                    sh 'kubectl apply -f app-deployment.yaml'
                 }
             }
         }
