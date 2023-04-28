@@ -11,10 +11,10 @@ kubectl apply -f auth-policy.yaml
 minikube tunnel
 
 
-#-----
+#------
 
-#kubectl delete ingress app-ingress
-#
-#kubectl delete authorizationpolicy require-jwt -n istio-system
-#
-#kubectl delete requestauthentication req-auth-jwt -n istio-system
+kubectl delete ingress app-ingress
+
+kubectl delete authorizationpolicy require-jwt -n istio-system
+
+kubectl delete requestauthentication req-auth-jwt -n istio-system
