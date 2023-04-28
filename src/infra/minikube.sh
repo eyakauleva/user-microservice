@@ -1,11 +1,5 @@
 #! /bin/bash
 
-kubectl apply -f zookeeper-service.yaml
-kubectl apply -f zookeeper-statefulset.yaml
-
-kubectl apply -f kafka-service.yaml
-kubectl apply -f kafka-deployment.yaml
-
 kubectl apply -f mongodb-secrets.yaml
 kubectl apply -f mongodb-service.yaml
 kubectl apply -f mongodb-statefulset.yaml
@@ -18,7 +12,7 @@ kubectl apply -f redis-secrets.yaml
 kubectl apply -f redis-service.yaml
 kubectl apply -f redis-statefulset.yaml
 
-export TAG=0.0.4
+export TAG=0.0.9
 kubectl apply -f app-configmap.yaml
 kubectl apply -f app-service.yaml
 envsubst < app-deployment.yaml | kubectl apply -f -

@@ -5,5 +5,5 @@ metadata:
 data:
   MONGODB_DOMAIN: mongodb-service-common
   POSTGRES_DOMAIN: pg-service-common
-  KAFKA_BOOTSTRAP_SERVERS: kafka-service
+  KAFKA_BOOTSTRAP_SERVERS: my-cluster-kafka-bootstrap.strimzi
   REDIS_HOST: redis-service

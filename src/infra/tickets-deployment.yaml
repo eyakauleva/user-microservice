@@ -11,8 +11,8 @@ spec:
     metadata:
       labels:
         app: tickets
-        sidecar.istio.io/inject: "true"
-        auth: jwt
+        #sidecar.istio.io/inject: "true"
+        #auth: jwt
     spec:
       containers:
         - name: tickets-app

@@ -4,6 +4,6 @@ metadata:
   name: user-configmap
 data:
   MONGODB_DOMAIN: mongodb-service-common
-  KAFKA_BOOTSTRAP_SERVERS: kafka-service
+  KAFKA_BOOTSTRAP_SERVERS: my-cluster-kafka-bootstrap.strimzi
   TICKET_SERVICE_DOMAIN: tickets-service
   REDIS_HOST: redis-service
