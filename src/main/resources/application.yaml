@@ -7,8 +7,12 @@ spring:
   jackson:
     default-property-inclusion: non_null
   data:
+    elasticsearch:
+      client:
+        reactive:
+          endpoints: ${ELASTIC_ADDRESS}:9200
     mongodb:
-      uri: mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_DOMAIN}:27017/users?authSource=admin
+      uri: mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_DOMAIN}:27017/users?authSource=admin&replicaSet=rs0
     redis:
       host: ${REDIS_HOST}
       port: 6379

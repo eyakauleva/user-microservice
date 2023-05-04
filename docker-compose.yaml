@@ -1,13 +1,32 @@
 services:
+
+  mongodb:
+    container_name: mongo
+    build:
+      dockerfile: ./src/infra/mongo-rs/Dockerfile
+    ports:
+      - 27017:27017
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=system
+    healthcheck:
+      test: test $$(echo 'rs.initiate({_id':' "rs0", members':' [{_id':' 1, "host"':' "mongodb':'27017"}]}) || rs.status().ok' | mongosh -u $${MONGO_INITDB_ROOT_USERNAME} -p $${MONGO_INITDB_ROOT_PASSWORD} --quiet) -eq 1
+      interval: 10s
+      start_period: 30s
+    volumes:
+      - mongodb:/data/db
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
-    container_name: micro-zookeeper
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+
   kafka:
     image: confluentinc/cp-kafka:7.3.0
-    container_name: micro-kafka
+    container_name: kafka
     ports:
       - "9092:9092"
     depends_on:
@@ -20,6 +39,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
   cache:
     image: redis:7.0.10
     container_name: redis-cache
@@ -30,5 +50,7 @@ services:
       - cache:/data
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+
 volumes:
   cache:
+  mongodb:
