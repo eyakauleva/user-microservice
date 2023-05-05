@@ -61,12 +61,18 @@ kubectl apply -f ./src/infra/istio/request-auth.yaml
 
 <a id="sync"></a>
 ## How to sync mongodb & elasticsearch
-
+### Without docker:
 1. Start mongodb replica set using ```./docker-compose.yaml``` <br/>
 (To create replica set image created via ```./src/infra/mongo-rs/Dockerfile``` is used)
-2. Start elasticsearch using ```./src/infra/docker-elk/docker-compose.yaml```
-3. Add ```127.0.0.1 mongodb``` to hosts file on your machine
+2. Start elasticsearch using ```./docker-compose.yaml```
+3. Add ```127.0.0.1 mongodb``` line to the hosts file on your machine
 4. Run ```npm instal``` in ```./src/infra/mongodb-elasticsearch```
 5. Run ```node index.js``` in ```./src/infra/mongodb-elasticsearch```
 
+### Using docker:
+
+1. Start mongodb replica set, elasticsearch and synchronizer using ```./docker-compose.yaml``` <br/>
+
+***Caution:*** without docker set mongodb and elasticsearch domains as localhost,
+otherwise set their service names
 
