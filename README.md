@@ -3,6 +3,8 @@ A simple sample of microservice on spring-boot.
 
 ##### 
 [Description](#description)<br/>
+[Semantic versioning](#version)<br/>
+[How to authenticate using Istio and JWT](#istio)<br/>
 [How to sync mongodb & elasticsearch](#sync)
 
 
@@ -16,10 +18,52 @@ This microservice is connected with another microservice via ***service registry
 ***Circuite breaker pattern*** is also implemented there. Use of the Circuit Breaker pattern can allow a microservice to continue operating when a related service fails, preventing the failure from cascading and giving the failing service time to recover. You wrap a protected function call in a circuit breaker object, which monitors for failures. Once the failures reach a certain threshold, the circuit breaker trips, and all further calls to the circuit breaker return with an error, without the protected call being made at all.
 
 
+<a id="version"></a>
+## Semantic versioning
+
+Github action (docker.yml) creates release with tag via https://github.com/mathieudutour/github-tag-action
+and then docker image with this generated tag is pushed to dockerhub. <br/>
+When deploying app to kubernetes set image version in ```./src/infra/minikube.sh``` to ```TAG``` variable
+
+
+<a id="istio"></a>
+## How to authenticate using Istio and JWT
+
+### If you don't have private and public keys:
+
+1. Set your data to ```payload``` variable in ```./src/infra/istio/rsa-jwt-generator/generate-keys-and-tokens-using-python.py```
+2. To generate private & public keys and token run 
+```bash
+python ./src/infra/istio/rsa-jwt-generator/generate-keys-and-tokens-using-python.py
+```
+3. Set issuer and generated public key to ```./src/infra/istio/request-auth.yaml```
+4. Apply changed to kubernetes 
+```bash
+kubectl apply -f ./src/infra/istio/request-auth.yaml
+```
+5. Add ```Authorization header``` to your request with ```Bearer <generated_token>```
+
+
+### If you have private and public keys:
+
+1. Set your private & public keys in ```./src/infra/istio/rsa-jwt-generator/generate-token.py```
+2. To generate token run
+```bash
+python ./src/infra/istio/rsa-jwt-generator/generate-token.py
+```
+3. Set issuer and generated public key to ```./src/infra/istio/request-auth.yaml```
+4. Apply changed to kubernetes
+```bash
+kubectl apply -f ./src/infra/istio/request-auth.yaml
+```
+5. Add ```Authorization header``` to your request with ```Bearer <generated_token>```
+
+
 <a id="sync"></a>
 ## How to sync mongodb & elasticsearch
 
-1. Start mongodb replica set using ```./docker-compose.yaml```
+1. Start mongodb replica set using ```./docker-compose.yaml``` <br/>
+(To create replica set image created via ```./src/infra/mongo-rs/Dockerfile``` is used)
 2. Start elasticsearch using ```./src/infra/docker-elk/docker-compose.yaml```
 3. Add ```127.0.0.1 mongodb``` to hosts file on your machine
 4. Run ```npm instal``` in ```./src/infra/mongodb-elasticsearch```
