@@ -1,5 +1,4 @@
-
-A simple sample of microservice on spring-boot.
+<br/>
 
 ##### 
 [Description](#description)<br/>
