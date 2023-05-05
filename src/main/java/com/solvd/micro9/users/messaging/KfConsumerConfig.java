@@ -19,15 +19,22 @@ public class KfConsumerConfig {
     private String topic;
 
     @Bean
-    public ReceiverOptions<String, Es> receiverOptions(KafkaProperties kafkaProperties) {
-        ReceiverOptions<String, Es> basicReceiverOptions = ReceiverOptions.create(kafkaProperties.buildConsumerProperties());
+    public ReceiverOptions<String, Es> receiverOptions(
+            final KafkaProperties kafkaProperties
+    ) {
+        ReceiverOptions<String, Es> basicReceiverOptions =
+                ReceiverOptions.create(kafkaProperties.buildConsumerProperties());
         return basicReceiverOptions.subscription(Collections.singletonList(topic))
-                .addAssignListener(receiverPartitions -> log.info("AssignListener: {}", receiverPartitions))
-                .addRevokeListener(receiverPartitions -> log.info("RevokeListener: {}", receiverPartitions));
+                .addAssignListener(receiverPartitions ->
+                        log.info("AssignListener: {}", receiverPartitions))
+                .addRevokeListener(receiverPartitions ->
+                        log.info("RevokeListener: {}", receiverPartitions));
     }
 
     @Bean
-    public ReactiveKafkaConsumerTemplate<String, Es> consumer(ReceiverOptions<String, Es> receiverOptions) {
+    public ReactiveKafkaConsumerTemplate<String, Es> consumer(
+            final ReceiverOptions<String, Es> receiverOptions
+    ) {
         return new ReactiveKafkaConsumerTemplate<>(receiverOptions);
     }
 

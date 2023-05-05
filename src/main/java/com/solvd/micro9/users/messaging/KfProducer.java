@@ -15,7 +15,7 @@ public class KfProducer {
 
     private final ReactiveKafkaProducerTemplate<String, Es> producer;
 
-    public void send(String key, Es value) {
+    public void send(final String key, final Es value) {
         producer.send(topic, key, value)
                 .subscribe();
     }

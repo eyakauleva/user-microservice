@@ -33,7 +33,9 @@ public class KfProducerConfig {
     }
 
     @Bean
-    public ReactiveKafkaProducerTemplate<String, Es> producer(KafkaProperties properties) {
+    public ReactiveKafkaProducerTemplate<String, Es> producer(
+            final KafkaProperties properties
+    ) {
         Map<String, Object> props = properties.buildProducerProperties();
         return new ReactiveKafkaProducerTemplate<>(SenderOptions.create(props));
     }

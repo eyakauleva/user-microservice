@@ -19,13 +19,13 @@ public class EsUser extends Es {
     public static final String SEQUENCE_NAME = "event_store_users_sequence";
 
     @Builder
-    public EsUser(Long id,
-                  EsType type,
-                  LocalDateTime time,
-                  String createdBy,
-                  String entityId,
-                  String payload,
-                  EsStatus status) {
+    public EsUser(final Long id,
+                  final EsType type,
+                  final LocalDateTime time,
+                  final String createdBy,
+                  final String entityId,
+                  final String payload,
+                  final EsStatus status) {
         super(id, type, time, createdBy, entityId, payload, status);
     }
 
