@@ -1,13 +1,51 @@
 services:
+
+  sync-mongo-elastic:
+    image: eyakauleva/sync-mongo-elastic:1.0
+    container_name: sync-mongo-elastic
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+      - elasticsearch
+    environment:
+      - MONGODB_DOMAIN=mongodb
+      - MONGODB_USER=${MONGODB_USER}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_COLLECTION=users
+      - ELASTIC_DOMAIN=elasticsearch
+      - ELASTIC_USER=${ELASTIC_USER}
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_INDEX=mongodb_logstash
+
+  mongodb:
+    container_name: mongo
+    build:
+      dockerfile: ./src/infra/mongo-rs/Dockerfile
+    ports:
+      - 27017:27017
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+    healthcheck:
+      test: test $$(echo 'rs.initiate({_id':' "rs0", members':' [{_id':' 1, "host"':' "mongodb':'27017"}]}) || rs.status().ok' | mongosh -u $${MONGO_INITDB_ROOT_USERNAME} -p $${MONGO_INITDB_ROOT_PASSWORD} --quiet) -eq 1
+      interval: 10s
+      start_period: 30s
+    volumes:
+      - mongodb:/data/db
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
-    container_name: micro-zookeeper
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+
   kafka:
     image: confluentinc/cp-kafka:7.3.0
-    container_name: micro-kafka
+    container_name: kafka
     ports:
       - "9092:9092"
     depends_on:
@@ -20,6 +58,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
   cache:
     image: redis:7.0.10
     container_name: redis-cache
@@ -30,5 +69,84 @@ services:
       - cache:/data
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+  setup:
+    container_name: setup-elk
+    build:
+      context: src/infra/docker-elk/setup/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    init: true
+    volumes:
+      - ./src/infra/docker-elk/setup/entrypoint.sh:/entrypoint.sh:ro,Z
+      - ./src/infra/docker-elk/setup/lib.sh:/lib.sh:ro,Z
+      - ./src/infra/docker-elk/setup/roles:/roles:ro,Z
+      - setup:/state:Z
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+    depends_on:
+      - elasticsearch
+
+  elasticsearch:
+    container_name: elasticsearch
+    build:
+      context: src/infra/docker-elk/elasticsearch/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    volumes:
+      - ./src/infra/docker-elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
+      - elasticsearch:/usr/share/elasticsearch/data:Z
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      node.name: elasticsearch
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      # Bootstrap password.
+      # Used to initialize the keystore during the initial startup of
+      # Elasticsearch. Ignored on subsequent runs.
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      discovery.type: single-node
+
+  logstash:
+    container_name: logstash
+    build:
+      context: src/infra/docker-elk/logstash/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    volumes:
+      - ./src/infra/docker-elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
+      - ./src/infra/docker-elk/logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
+    ports:
+      - 5044:5044
+      - 50000:50000/tcp
+      - 50000:50000/udp
+      - 9600:9600
+    environment:
+      LS_JAVA_OPTS: -Xms256m -Xmx256m
+      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    container_name: kibana
+    build:
+      context: src/infra/docker-elk/kibana/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    volumes:
+      - ./src/infra/docker-elk/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
+    ports:
+      - 5601:5601
+    environment:
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+    depends_on:
+      - elasticsearch
+
 volumes:
   cache:
+  mongodb:
+  setup:
+  elasticsearch:
