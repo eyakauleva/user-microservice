@@ -24,7 +24,7 @@ This microservice is connected with another microservice via ***service registry
 Github action (docker.yml) creates release with tag via https://github.com/mathieudutour/github-tag-action
 and then docker image with this generated tag is pushed to dockerhub. <br/>
 When deploying app to kubernetes set image version in ```./src/infra/minikube.sh``` to ```TAG``` variable
-
+<br/><br/>
 
 <a id="istio"></a>
 ## How to authenticate using Istio and JWT
@@ -57,7 +57,7 @@ python ./src/infra/istio/rsa-jwt-generator/generate-token.py
 kubectl apply -f ./src/infra/istio/request-auth.yaml
 ```
 5. Add ```Authorization header``` to your request with ```Bearer <generated_token>```
-
+<br/><br/>
 
 <a id="sync"></a>
 ## How to sync mongodb & elasticsearch
