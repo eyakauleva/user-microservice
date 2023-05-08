@@ -3,7 +3,6 @@ package com.solvd.micro9.users.service.impl;
 import com.google.gson.Gson;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.es.Es;
-import com.solvd.micro9.users.domain.es.EsType;
 import com.solvd.micro9.users.messaging.KfProducer;
 import com.solvd.micro9.users.persistence.snapshot.UserRepository;
 import com.solvd.micro9.users.service.UserService;
