@@ -3,7 +3,8 @@
 [Description](#description)<br/>
 [Semantic versioning](#version)<br/>
 [How to authenticate using Istio and JWT](#istio)<br/>
-[How to sync mongodb & elasticsearch](#sync)
+[How to sync mongodb & elasticsearch (via mongodb change streams)](#sync_changestreams)
+[Kafka connector to elasticsearch](#sync_kafka)
 
 
 <a id="description"></a>
@@ -57,8 +58,9 @@ kubectl apply -f ./src/infra/istio/request-auth.yaml
 5. Add ```Authorization header``` to your request with ```Bearer <generated_token>```
 <br/><br/>
 
-<a id="sync"></a>
-## How to sync mongodb & elasticsearch
+
+<a id="sync_changestreams"></a>
+## How to sync mongodb & elasticsearch (via mongodb change streams)
 ### Without docker:
 1. Start mongodb replica set using ```./docker-compose.yaml``` <br/>
 (To create replica set image created via ```./src/infra/mongo-rs/Dockerfile``` is used)
@@ -71,6 +73,26 @@ kubectl apply -f ./src/infra/istio/request-auth.yaml
 
 1. Start mongodb replica set, elasticsearch and synchronizer using ```./docker-compose.yaml``` <br/>
 
-***Caution:*** without docker set mongodb and elasticsearch domains as localhost,
+***CAUTION:*** without docker set mongodb and elasticsearch domains as localhost,
 otherwise set their service names
+<br/><br/>
+
+
+<a id="sync_kafka"></a>
+## Kafka connector to elasticsearch
+
+1. Start kafka-connect container using ```./docker-compose.yaml``` <br/>
+2. Create kafka-connector by sending a POST request to ```http://localhost:8083/connectors``` url <br/>
+with body like in ```src/infra/kafka-connect-elastic/kafka-elastic-connector.json``` example <br/>
+   (kafka topic and elasticsearch index will have the same name mentioned in ```topics``` field) <br/>
+3. Send messages to kafka
+
+To list all connectors make a GET request to ```http://localhost:8083/connectors``` <br/>
+To delete a connecter make a DELETE-request to ```http://localhost:8083/connectors/<connector-name>``` <br/>
+To get connector status make a GET request to ```http://localhost:8083/connectors/<connector-name>/tasks/0/status``` <br/>
+
+***CAUTION:*** if you want to change your connector config (after you already created it), <br/>
+you have to delete the existing one and create a new one with changed configs and
+***!!! necessarily a new name !!!*** <br/>
+(even if you have deleted kafka-connect container, new kafka-connector name is required!) 
 
