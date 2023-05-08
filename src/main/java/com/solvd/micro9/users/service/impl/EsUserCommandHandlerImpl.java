@@ -34,10 +34,10 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
     private final DbSynchronizer synchronizer;
 
     @Autowired
-    public EsUserCommandHandlerImpl(EsUserRepository esUserRepository,
-                                    KfProducer producer,
+    public EsUserCommandHandlerImpl(final EsUserRepository esUserRepository,
+                                    final KfProducer producer,
                                     final ReactiveRedisOperations<String, User> operations,
-                                    DbSynchronizer synchronizer) {
+                                    final DbSynchronizer synchronizer) {
         this.esUserRepository = esUserRepository;
         this.producer = producer;
         this.cache = operations.opsForHash();
@@ -45,7 +45,7 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
     }
 
     @Override
-    public Mono<EsUser> apply(CreateUserCommand command) {
+    public Mono<EsUser> apply(final CreateUserCommand command) {
         String payload = new Gson().toJson(command.getUser());
         EsUser event = EsUser.builder()
                 .type(EsType.USER_CREATED)
@@ -60,7 +60,11 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
                     command.getUser().setId(
                             createdEvent.getEntityId()
                     );
-                    cache.put(RedisConfig.CACHE_KEY, createdEvent.getEntityId(), command.getUser())
+                    cache.put(
+                                RedisConfig.CACHE_KEY,
+                                createdEvent.getEntityId(),
+                                command.getUser()
+                            )
                             .subscribeOn(Schedulers.boundedElastic())
                             .subscribe();
                     synchronizer.sync(createdEvent);
@@ -68,7 +72,7 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
     }
 
     @Override
-    public Mono<EsUser> apply(DeleteUserCommand command) {
+    public Mono<EsUser> apply(final DeleteUserCommand command) {
         EsUser event = EsUser.builder()
                 .type(EsType.USER_DELETED)
                 .time(LocalDateTime.now())
@@ -77,11 +81,14 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
                 .status(EsStatus.PENDING)
                 .build();
         return esUserRepository.save(event)
-                .doOnNext(createdEvent -> producer.send(EsType.USER_DELETED.toString(), createdEvent));
+                .doOnNext(createdEvent ->
+                        producer.send(EsType.USER_DELETED.toString(),
+                                createdEvent)
+                );
     }
 
     @Override
-    public void apply(CompleteTransactionCommand command) {
+    public void apply(final CompleteTransactionCommand command) {
         esUserRepository.findByEntityIdTypeStatus(
                         command.getUserId(),
                         EsType.USER_DELETED
@@ -106,12 +113,19 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
                                             .subscribeOn(Schedulers.boundedElastic())
                                             .subscribe();
                                     if (EsStatus.SUBMITTED.equals(command.getStatus())) {
-                                        cache.remove(RedisConfig.CACHE_KEY, esUser.getEntityId())
+                                        cache
+                                                .remove(
+                                                    RedisConfig.CACHE_KEY,
+                                                    esUser.getEntityId()
+                                                )
                                                 .subscribeOn(Schedulers.boundedElastic())
                                                 .subscribe();
                                         synchronizer.sync(completeEvent);
                                     }
-                                    producer.send(EsType.USER_DELETED.toString(), completeEvent);
+                                    producer.send(
+                                            EsType.USER_DELETED.toString(),
+                                            completeEvent
+                                    );
                                     return esUser;
                                 })
                                 .subscribeOn(Schedulers.boundedElastic())

@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public Mono<User> create(Es eventStore) {
+    public Mono<User> create(final Es eventStore) {
         User user = new Gson().fromJson(eventStore.getPayload(), User.class);
         user.setId(eventStore.getEntityId());
         user.setNew(true);
@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<Void> delete(Es eventStore) {
+    public Mono<Void> delete(final Es eventStore) {
         return userRepository.deleteById(eventStore.getEntityId());
     }
 

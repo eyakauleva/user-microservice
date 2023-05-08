@@ -13,15 +13,21 @@ import java.time.format.DateTimeFormatter;
 @Configuration
 public class WebConfig {
 
-    private static final String dateTimeFormat = "yyyy-MM-dd HH:mm";
+    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
 
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
-        return builder -> builder.simpleDateFormat(dateTimeFormat)
+        return builder -> builder.simpleDateFormat(DATE_TIME_FORMAT)
                 .serializerByType(LocalDateTime.class,
-                        new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(dateTimeFormat)))
+                        new LocalDateTimeSerializer(
+                                DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)
+                        )
+                )
                 .deserializerByType(LocalDateTime.class,
-                        new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(dateTimeFormat)));
+                        new LocalDateTimeDeserializer(
+                                DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)
+                        )
+                );
     }
 
     @Bean

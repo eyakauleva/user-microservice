@@ -16,7 +16,7 @@ public class ExceptionBody {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<BindingError> bindingErrors;
 
-    public ExceptionBody(String message) {
+    public ExceptionBody(final String message) {
         this.message = message;
     }
 
