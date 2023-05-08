@@ -61,9 +61,9 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
                             createdEvent.getEntityId()
                     );
                     cache.put(
-                                    RedisConfig.CACHE_KEY,
-                                    createdEvent.getEntityId(),
-                                    command.getUser()
+                                RedisConfig.CACHE_KEY,
+                                createdEvent.getEntityId(),
+                                command.getUser()
                             )
                             .subscribeOn(Schedulers.boundedElastic())
                             .subscribe();
@@ -115,8 +115,8 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
                                     if (EsStatus.SUBMITTED.equals(command.getStatus())) {
                                         cache
                                                 .remove(
-                                                        RedisConfig.CACHE_KEY,
-                                                        esUser.getEntityId()
+                                                    RedisConfig.CACHE_KEY,
+                                                    esUser.getEntityId()
                                                 )
                                                 .subscribeOn(Schedulers.boundedElastic())
                                                 .subscribe();
