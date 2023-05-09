@@ -20,7 +20,7 @@ This microservice is connected with another microservice via ***service registry
 <a id="version"></a>
 ## Semantic versioning
 
-Github action (docker.yml) creates release with tag via https://github.com/mathieudutour/github-tag-action
+Github action (docker.yml) creates tag via https://github.com/mathieudutour/github-tag-action
 and then docker image with this generated tag is pushed to dockerhub. <br/>
 When deploying app to kubernetes set image version in ```./src/infra/minikube.sh``` to ```TAG``` variable
 <br/><br/>
