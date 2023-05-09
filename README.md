@@ -6,8 +6,6 @@
 [How to sync mongodb & elasticsearch (via mongodb change streams)](#sync_changestreams)
 [Kafka connector to elasticsearch](#sync_kafka)
 
-111111111111111
-
 <a id="description"></a>
 ## Description
 
