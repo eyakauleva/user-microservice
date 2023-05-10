@@ -1,0 +1,74 @@
+
+ticket-service: ${TICKET_SERVICE_DOMAIN}:9090
+
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  jackson:
+    default-property-inclusion: non_null
+  data:
+    mongodb:
+      uri: mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_DOMAIN}:27017/users?authSource=admin&replicaSet=rs0
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+      password: ${REDIS_PASSWORD}
+  application:
+    name: USER-SERVICE
+  kafka:
+    partitions: 3
+    replicas: 1
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}:9092
+    properties:
+      spring:
+        json:
+          trusted:
+            packages: com.solvd.micro9.users.web.dto
+    producer:
+      topic: users
+      syncTopic: syncMongoElastic
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring:
+          json:
+            add:
+              type:
+                headers: false
+    consumer:
+      topic: events
+      group-id: userGroup
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            value:
+              default:
+                type: com.solvd.micro9.users.domain.es.Es
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      user-service:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
