@@ -3,7 +3,7 @@ ticket-service: ${TICKET_SERVICE_DOMAIN}:9090
 
 spring:
   config:
-    import: optional:file:.env[.env.example]
+    import: optional:file:.env[.example]
   jackson:
     default-property-inclusion: non_null
   data:
