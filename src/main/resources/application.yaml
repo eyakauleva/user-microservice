@@ -1,5 +1,5 @@
 
-ticket-service: ${TICKET_SERVICE_DOMAIN}:9090
+ticket-service: ${MONGODB_USER}:9090 #TICKET_SERVICE_DOMAIN
 
 spring:
   config:
