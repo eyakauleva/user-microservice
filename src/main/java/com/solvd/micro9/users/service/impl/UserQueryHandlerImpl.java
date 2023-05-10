@@ -25,7 +25,7 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
     private final ReactiveHashOperations<String, String, User> cache;
     private boolean areAllUsersInCache = false;
 
-    public UserQueryHandlerImpl(UserRepository userRepository,
+    public UserQueryHandlerImpl(final UserRepository userRepository,
                                 final ReactiveRedisOperations<String, User> operations) {
         this.userRepository = userRepository;
         this.cache = operations.opsForHash();
@@ -46,16 +46,18 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
     }
 
     @Override
-    public Mono<User> findById(EsUserQuery query) {
+    public Mono<User> findById(final EsUserQuery query) {
         return cache.get(RedisConfig.CACHE_KEY, query.getId())
                 .switchIfEmpty(Mono.defer(() -> fromDbToCache(query.getId())));
     }
 
-    private Mono<User> fromDbToCache(String id) {
+    private Mono<User> fromDbToCache(final String id) {
         return userRepository.findById(id)
                 .switchIfEmpty(Mono
                         .error(
-                                new ResourceDoesNotExistException("User [id=" + id + "] does not exist")
+                                new ResourceDoesNotExistException(
+                                        "User [id=" + id + "] does not exist"
+                                )
                         )
                 )
                 .flatMap(user -> cache.put(RedisConfig.CACHE_KEY, id, user)

@@ -1,5 +1,6 @@
 package com.solvd.micro9.users.messaging;
 
+import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.es.Es;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +19,9 @@ public class KfProducerConfig {
     @Value("${spring.kafka.producer.topic}")
     private String topic;
 
+    @Value("${spring.kafka.producer.syncTopic}")
+    private String syncTopic;
+
     @Value("${spring.kafka.partitions}")
     private int partitionCount;
 
@@ -33,7 +37,25 @@ public class KfProducerConfig {
     }
 
     @Bean
-    public ReactiveKafkaProducerTemplate<String, Es> producer(KafkaProperties properties) {
+    public NewTopic syncTopic() {
+        return TopicBuilder.name(syncTopic)
+                .partitions(partitionCount)
+                .replicas(replicaCount)
+                .build();
+    }
+
+    @Bean
+    public ReactiveKafkaProducerTemplate<String, Es> producer(
+            final KafkaProperties properties
+    ) {
+        Map<String, Object> props = properties.buildProducerProperties();
+        return new ReactiveKafkaProducerTemplate<>(SenderOptions.create(props));
+    }
+
+    @Bean
+    public ReactiveKafkaProducerTemplate<String, User> syncProducer(
+            final KafkaProperties properties
+    ) {
         Map<String, Object> props = properties.buildProducerProperties();
         return new ReactiveKafkaProducerTemplate<>(SenderOptions.create(props));
     }

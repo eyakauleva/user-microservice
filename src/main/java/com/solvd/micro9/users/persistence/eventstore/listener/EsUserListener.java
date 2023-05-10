@@ -18,7 +18,7 @@ public class EsUserListener extends AbstractMongoEventListener<EsUser> {
     private final SequenceGeneratorService sequenceGenerator;
 
     @Override
-    public void onBeforeConvert(BeforeConvertEvent<EsUser> event) {
+    public void onBeforeConvert(final BeforeConvertEvent<EsUser> event) {
         try {
             if (Objects.isNull(event.getSource().getId())) {
                 event.getSource().setId(

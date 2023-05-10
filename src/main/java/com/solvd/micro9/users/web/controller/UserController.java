@@ -23,7 +23,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -49,7 +56,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
-    public Mono<UserDto> findByUserId(@PathVariable(name = "id") String userId) {
+    public Mono<UserDto> findByUserId(@PathVariable(name = "id") final String userId) {
         EsUserQuery query = new EsUserQuery(userId);
         Mono<User> user = queryHandler.findById(query);
         return userMapper.domainToDto(user);
@@ -57,7 +64,9 @@ public class UserController {
 
     @GetMapping(value = "/{id}/events")
     @CircuitBreaker(name = USER_SERVICE, fallbackMethod = "fluxCircuitBreakerFallback")
-    public Flux<EventDto> findEventsByUserId(@PathVariable(name = "id") String userId) {
+    public Flux<EventDto> findEventsByUserId(
+            @PathVariable(name = "id") final String userId
+    ) {
         String url = "http://" + ticketService + "/api/v1/events/user/" + userId;
         return webClientBuilder.build()
                 .get()
@@ -69,7 +78,10 @@ public class UserController {
     @PostMapping(value = "/{id}/tickets")
     @ResponseStatus(HttpStatus.CREATED)
     @CircuitBreaker(name = USER_SERVICE, fallbackMethod = "monoCircuitBreakerFallback")
-    public Mono<EsDto> createTicket(@PathVariable(name = "id") String userId, @RequestBody TicketDto ticketDto) {
+    public Mono<EsDto> createTicket(
+            @PathVariable(name = "id") final String userId,
+            @RequestBody final TicketDto ticketDto
+    ) {
         String url = "http://" + ticketService + "/api/v1/tickets";
         ticketDto.setUserId(userId);
         return webClientBuilder.build()
@@ -80,36 +92,41 @@ public class UserController {
                 .retrieve()
                 .onStatus(
                         status -> status.equals(HttpStatus.BAD_REQUEST),
-                        (ex) ->
-                                ex.bodyToMono(String.class)
-                                        .handle(
-                                                (body, handler) -> {
-                                                    ExceptionBody exceptionBody = new Gson().fromJson(body, ExceptionBody.class);
-                                                    handler.error(new BadRequestException(exceptionBody));
-                                                }))
+                        (ex) -> ex.bodyToMono(String.class).handle(
+                                (body, handler) -> {
+                                    ExceptionBody exceptionBody = new Gson().fromJson(
+                                            body, ExceptionBody.class
+                                    );
+                                    handler.error(new BadRequestException(exceptionBody));
+                                }
+                                )
+                )
                 .bodyToMono(EsDto.class);
     }
 
     @PostMapping
-    public Mono<EsUser> create(@RequestBody @Validated UserDto userDto) {
+    public Mono<EsUser> create(@RequestBody @Validated final UserDto userDto) {
         User user = userMapper.dtoToDomain(userDto);
         CreateUserCommand command = new CreateUserCommand(user, "Liza123");
         return commandHandler.apply(command);
     }
 
     @DeleteMapping(value = "/{id}")
-    public Mono<EsUser> delete(@PathVariable("id") String id) {
+    public Mono<EsUser> delete(@PathVariable("id") final String id) {
         DeleteUserCommand command = new DeleteUserCommand(id, "Liza123");
         return commandHandler.apply(command);
     }
 
     @SneakyThrows
-    private Mono<?> monoCircuitBreakerFallback(Exception ex) {
-        if (ex instanceof BadRequestException) throw ex;
-        else throw new ServiceIsNotAvailableException("Sorry, we have some issues :(");
+    private Mono<?> monoCircuitBreakerFallback(final Exception ex) {
+        if (ex instanceof BadRequestException) {
+            throw ex;
+        } else {
+            throw new ServiceIsNotAvailableException("Sorry, we have some issues :(");
+        }
     }
 
-    private Flux<?> fluxCircuitBreakerFallback(Exception ex) {
+    private Flux<?> fluxCircuitBreakerFallback(final Exception ex) {
         throw new ServiceIsNotAvailableException("Sorry, we have some issues :(");
     }
 

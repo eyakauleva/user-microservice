@@ -28,11 +28,14 @@ public class KfConsumer {
                     if (EsType.TICKET_USER_DELETED.equals(record.value().getType())
                             && !EsStatus.PENDING.equals(record.value().getStatus())) {
                         log.info("received value: {}", record.value());
-                        Ticket ticket = new Gson().fromJson(record.value().getPayload(), Ticket.class);
-                        CompleteTransactionCommand command = new CompleteTransactionCommand(
-                                ticket.getUserId(),
-                                record.value().getStatus()
+                        Ticket ticket = new Gson().fromJson(
+                                record.value().getPayload(), Ticket.class
                         );
+                        CompleteTransactionCommand command =
+                                new CompleteTransactionCommand(
+                                        ticket.getUserId(),
+                                        record.value().getStatus()
+                                );
                         commandHandler.apply(command);
                     }
                     record.receiverOffset().acknowledge();

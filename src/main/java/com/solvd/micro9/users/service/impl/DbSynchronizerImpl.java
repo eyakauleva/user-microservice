@@ -14,8 +14,8 @@ public class DbSynchronizerImpl implements DbSynchronizer {
     private final UserService userService;
 
     @Override
-    public void sync(Es event) {
-        switch (event.getType()){
+    public void sync(final Es event) {
+        switch (event.getType()) {
             case USER_CREATED:
                 userService.create(event)
                         .subscribeOn(Schedulers.boundedElastic())
@@ -25,6 +25,8 @@ public class DbSynchronizerImpl implements DbSynchronizer {
                 userService.delete(event)
                         .subscribeOn(Schedulers.boundedElastic())
                         .subscribe();
+                break;
+            default:
                 break;
         }
     }

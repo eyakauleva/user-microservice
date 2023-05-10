@@ -4,7 +4,7 @@ public class BadRequestException extends RuntimeException {
 
     private final ExceptionBody exceptionBody;
 
-    public BadRequestException(ExceptionBody exceptionBody) {
+    public BadRequestException(final ExceptionBody exceptionBody) {
         this.exceptionBody = exceptionBody;
     }
 

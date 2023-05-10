@@ -17,13 +17,17 @@ public class ExceptionHandling {
 
     @ExceptionHandler(WebExchangeBindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Mono<ExceptionBody> handleException(WebExchangeBindException ex) {
+    public Mono<ExceptionBody> handleException(
+            final WebExchangeBindException ex
+    ) {
         List<BindingError> bindingErrors = ex.getBindingResult()
                 .getAllErrors()
                 .stream()
                 .map(fieldError ->
                         new BindingError(
-                                fieldError.getObjectName() + "." + ((FieldError) fieldError).getField(),
+                                fieldError.getObjectName()
+                                        + "."
+                                        + ((FieldError) fieldError).getField(),
                                 fieldError.getDefaultMessage()))
                 .collect(Collectors.toList());
         return Mono.just(new ExceptionBody("Binding errors", bindingErrors));
@@ -31,19 +35,25 @@ public class ExceptionHandling {
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionBody handleBadRequestException(BadRequestException ex) {
+    public ExceptionBody handleBadRequestException(
+            final BadRequestException ex
+    ) {
         return ex.getExceptionBody();
     }
 
     @ExceptionHandler(ResourceDoesNotExistException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Mono<ExceptionBody> handleResourceDoesNotExistException(ResourceDoesNotExistException ex) {
+    public Mono<ExceptionBody> handleResourceDoesNotExistException(
+            final ResourceDoesNotExistException ex
+    ) {
         return Mono.just(new ExceptionBody(ex.getMessage()));
     }
 
     @ExceptionHandler(ServiceIsNotAvailableException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionBody handleServiceIsNotAvailableException(ServiceIsNotAvailableException ex) {
+    public ExceptionBody handleServiceIsNotAvailableException(
+            final ServiceIsNotAvailableException ex
+    ) {
         return new ExceptionBody(ex.getMessage());
     }
 

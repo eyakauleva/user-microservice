@@ -15,10 +15,10 @@ public interface EsUserRepository extends ReactiveMongoRepository<EsUser, Long> 
                                           @Param("type") EsType type,
                                           @Param("status") EsStatus status);
 
-    @Query("{$and : [ " +
-            "{entityId : ?0}, " +
-            "{type : ?1}, " +
-            "{ $or : [{status: 'SUBMITTED'}, {status : 'CANCELED'}] } ]}")
+    @Query("{$and : [ "
+            + "{entityId : ?0}, "
+            + "{type : ?1}, "
+            + "{ $or : [{status: 'SUBMITTED'}, {status : 'CANCELED'}] } ]}")
     Flux<EsUser> findByEntityIdTypeStatus(String entityId, EsType type);
 
 }
