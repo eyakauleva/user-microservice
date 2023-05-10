@@ -1,5 +1,5 @@
-#${TICKET_SERVICE_DOMAIN}
-ticket-service: localhost:9090
+
+ticket-service: ${TICKET_SERVICE_DOMAIN}:9090
 
 spring:
   config:
