@@ -40,7 +40,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UserController {
 
-    @Value("${spring.ticket-service2}")
+    @Value("${ticket-service}")
     private String ticketService;
 
     private final EsUserCommandHandler commandHandler;
