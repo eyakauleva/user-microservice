@@ -1,7 +1,8 @@
 
-ticket-service: ${TICKET_SERVICE_DOMAIN}:9090
+ticket-service: localhost:9090 #
 
 spring:
+  ticket-service2: ${TICKET_SERVICE_DOMAIN}:9090
   config:
     import: optional:file:.env[.properties]
   jackson:
