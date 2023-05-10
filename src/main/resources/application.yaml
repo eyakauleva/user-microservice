@@ -1,6 +1,6 @@
 
-ticket-service: ${MONGODB_USER}:9090 #TICKET_SERVICE_DOMAIN
-
+#ticket-service: 1111111:9090 #TICKET_SERVICE_DOMAIN
+ticket-service: ${REDIS_HOST}
 spring:
   config:
     import: optional:file:.env[.properties]
