@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final KfProducer producer;
+    private final KfProducer<String, User> producer;
 
     @Override
     public Mono<User> create(final Es eventStore) {

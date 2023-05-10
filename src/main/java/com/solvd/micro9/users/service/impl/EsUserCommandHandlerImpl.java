@@ -5,6 +5,7 @@ import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.command.CompleteTransactionCommand;
 import com.solvd.micro9.users.domain.command.CreateUserCommand;
 import com.solvd.micro9.users.domain.command.DeleteUserCommand;
+import com.solvd.micro9.users.domain.es.Es;
 import com.solvd.micro9.users.domain.es.EsStatus;
 import com.solvd.micro9.users.domain.es.EsType;
 import com.solvd.micro9.users.domain.es.EsUser;
@@ -29,13 +30,13 @@ import java.util.UUID;
 public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
 
     private final EsUserRepository esUserRepository;
-    private final KfProducer producer;
+    private final KfProducer<String, Es> producer;
     private final ReactiveHashOperations<String, String, User> cache;
     private final DbSynchronizer synchronizer;
 
     @Autowired
     public EsUserCommandHandlerImpl(final EsUserRepository esUserRepository,
-                                    final KfProducer producer,
+                                    final KfProducer<String, Es> producer,
                                     final ReactiveRedisOperations<String, User> operations,
                                     final DbSynchronizer synchronizer) {
         this.esUserRepository = esUserRepository;
