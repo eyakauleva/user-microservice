@@ -20,4 +20,6 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn clean -DTICKET_SERVICE_DOMAIN=localhost install
+      run: |
+        export  TICKET_SERVICE_DOMAIN=localhost
+        mvn clean install
