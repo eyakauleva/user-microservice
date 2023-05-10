@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 public class UserProducer implements KfProducer<String, User> {
 
     @Value("${spring.kafka.producer.syncTopic}")
-    private String syncTopic;
+    private String topic;
 
-    private final ReactiveKafkaProducerTemplate<String, User> syncProducer;
+    private final ReactiveKafkaProducerTemplate<String, User> producer;
 
     @Override
     public void send(final String key, final User value) {
-        syncProducer.send(syncTopic, key, value)
+        producer.send(topic, key, value)
                 .subscribe();
     }
 
