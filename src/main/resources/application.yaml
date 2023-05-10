@@ -1,6 +1,5 @@
 
 ticket-service: localhost:9090 #
-qwerty: ${REDIS_HOST}
 
 spring:
   ticket-service2: ${TICKET_SERVICE_DOMAIN}:9090
