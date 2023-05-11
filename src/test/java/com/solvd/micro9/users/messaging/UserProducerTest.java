@@ -13,7 +13,6 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -28,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 @SpringBootTest
-//@TestPropertySource(properties = {"ticket-service = localhost:9090"})
 @DirtiesContext
 @Testcontainers
 public class UserProducerTest {
@@ -42,6 +40,7 @@ public class UserProducerTest {
 
     @DynamicPropertySource
     static void kafkaProperties(DynamicPropertyRegistry registry) {
+        registry.add("ticket-service", () -> "localhost:9090");
         registry.add("spring.kafka.bootstrap-servers", kafkaContainer::getBootstrapServers);
         registry.add("spring.kafka.producer.value-serializer", () -> JsonSerializer.class);
     }
@@ -54,14 +53,7 @@ public class UserProducerTest {
         //given
         User user = new User("9999", "Liza", "Ya", "email@gmail.com", false);
 
-        Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, com.solvd.micro9.users.domain.aggregate.User.class);
-
-        try (Consumer<String, User> consumer = new KafkaConsumer<>(props)) {
+        try (Consumer<String, User> consumer = new KafkaConsumer<>(getConsumerProps())) {
             consumer.subscribe(Collections.singleton(TOPIC));
 
             //when
@@ -80,5 +72,14 @@ public class UserProducerTest {
         }
     }
 
+    private Map<String, Object> getConsumerProps() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, com.solvd.micro9.users.domain.aggregate.User.class);
+        return props;
+    }
 
 }
