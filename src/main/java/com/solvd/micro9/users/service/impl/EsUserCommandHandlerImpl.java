@@ -11,7 +11,6 @@ import com.solvd.micro9.users.domain.es.EsType;
 import com.solvd.micro9.users.domain.es.EsUser;
 import com.solvd.micro9.users.messaging.KfProducer;
 import com.solvd.micro9.users.persistence.eventstore.EsUserRepository;
-import com.solvd.micro9.users.service.DbSynchronizer;
 import com.solvd.micro9.users.service.EsUserCommandHandler;
 import com.solvd.micro9.users.service.cache.RedisConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +22,9 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 @Service
 @Slf4j
@@ -32,17 +33,17 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
     private final EsUserRepository esUserRepository;
     private final KfProducer<String, Es> producer;
     private final ReactiveHashOperations<String, String, User> cache;
-    private final DbSynchronizer synchronizer;
+    private final Map<EsType, Function<Es, Mono<?>>> dbSynchronizerHandler;
 
     @Autowired
     public EsUserCommandHandlerImpl(final EsUserRepository esUserRepository,
                                     final KfProducer<String, Es> producer,
                                     final ReactiveRedisOperations<String, User> operations,
-                                    final DbSynchronizer synchronizer) {
+                                    final Map<EsType, Function<Es, Mono<?>>> dbSynchronizerHandler) {
         this.esUserRepository = esUserRepository;
         this.producer = producer;
         this.cache = operations.opsForHash();
-        this.synchronizer = synchronizer;
+        this.dbSynchronizerHandler = dbSynchronizerHandler;
     }
 
     @Override
@@ -68,7 +69,10 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
                             )
                             .subscribeOn(Schedulers.boundedElastic())
                             .subscribe();
-                    synchronizer.sync(createdEvent);
+//                    synchronizer.sync(createdEvent);
+                    dbSynchronizerHandler.get(createdEvent.getType()).apply(createdEvent)
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .subscribe();
                 });
     }
 
@@ -82,10 +86,8 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
                 .status(EsStatus.PENDING)
                 .build();
         return esUserRepository.save(event)
-                .doOnNext(createdEvent ->
-                        producer.send(EsType.USER_DELETED.toString(),
-                                createdEvent)
-                );
+                .doOnNext(createdEvent -> producer.send(EsType.USER_DELETED.toString(),
+                        createdEvent));
     }
 
     @Override
@@ -121,7 +123,9 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
                                                 )
                                                 .subscribeOn(Schedulers.boundedElastic())
                                                 .subscribe();
-                                        synchronizer.sync(completeEvent);
+                                        dbSynchronizerHandler.get(completeEvent.getType()).apply(completeEvent)
+                                                .subscribeOn(Schedulers.boundedElastic())
+                                                .subscribe();
                                     }
                                     producer.send(
                                             EsType.USER_DELETED.toString(),
