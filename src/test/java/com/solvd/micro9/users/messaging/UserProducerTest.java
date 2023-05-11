@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 @SpringBootTest
-@TestPropertySource(properties = {"ticket-service = localhost:9090"})
+//@TestPropertySource(properties = {"ticket-service = localhost:9090"})
 @DirtiesContext
 @Testcontainers
 public class UserProducerTest {
