@@ -31,9 +31,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<Void> delete(final Es eventStore) {
         return userRepository.deleteById(eventStore.getEntityId())
-                .doOnSuccess(voidReturned -> {
-                    producer.send(eventStore.getEntityId(), (User) null);
-                });
+                .doOnSuccess(voidReturned ->
+                        producer.send(eventStore.getEntityId(), null));
     }
 
 }
