@@ -58,7 +58,8 @@ public class EsProducerTest {
                 .status(EsStatus.SUBMITTED)
                 .build();
 
-        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("test-group", "true", embeddedKafka);
+        Map<String, Object> consumerProps = KafkaTestUtils
+                .consumerProps("test-group", "true", embeddedKafka);
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         consumerProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, com.solvd.micro9.users.domain.es.Es.class);

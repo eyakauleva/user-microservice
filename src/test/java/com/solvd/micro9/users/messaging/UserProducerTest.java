@@ -42,7 +42,8 @@ public class UserProducerTest {
         //given
         User user = new User("1111", "Liza", "Ya", "email@gmail.com", false);
 
-        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("test-group", "true", embeddedKafka);
+        Map<String, Object> consumerProps = KafkaTestUtils
+                .consumerProps("test-group", "true", embeddedKafka);
         try (Consumer<String, User> consumer = new KafkaConsumer<>(consumerProps)) {
             consumer.subscribe(Collections.singleton(TOPIC));
 
