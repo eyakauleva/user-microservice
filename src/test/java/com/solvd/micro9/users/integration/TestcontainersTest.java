@@ -1,5 +1,7 @@
 package com.solvd.micro9.users.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -10,6 +12,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +46,14 @@ public abstract class TestcontainersTest {
         );
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, clazz);
         return props;
+    }
+
+    public ObjectMapper getObjectMapper() {
+        ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        mapper.registerModule(new JavaTimeModule());
+        mapper.setDateFormat(dateFormat);
+        return mapper;
     }
 
 }
