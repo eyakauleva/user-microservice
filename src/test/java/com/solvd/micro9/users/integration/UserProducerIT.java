@@ -1,7 +1,8 @@
-package com.solvd.micro9.users.messaging;
+package com.solvd.micro9.users.integration;
 
 import com.google.gson.Gson;
 import com.solvd.micro9.users.domain.aggregate.User;
+import com.solvd.micro9.users.messaging.UserProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -34,9 +35,7 @@ public class UserProducerIT extends TestcontainersTest {
         )) {
             consumer.subscribe(Collections.singleton(TOPIC));
             producer.send(user.getId(), user);
-            ConsumerRecords<String, User> records = consumer.poll(
-                    Duration.ofSeconds(getPollSeconds())
-            );
+            ConsumerRecords<String, User> records = consumer.poll(Duration.ofSeconds(5));
             ConsumerRecord<String, User> record = records.iterator().next();
             User result = new Gson().fromJson(
                     String.valueOf(record.value()), User.class

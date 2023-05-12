@@ -1,4 +1,4 @@
-package com.solvd.micro9.users.messaging;
+package com.solvd.micro9.users.integration;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -15,8 +15,6 @@ import java.util.Map;
 
 @Testcontainers
 public abstract class TestcontainersTest {
-
-    private final int pollSeconds = 5;
 
     @Container
     private static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
@@ -45,10 +43,6 @@ public abstract class TestcontainersTest {
         );
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, clazz);
         return props;
-    }
-
-    public int getPollSeconds() {
-        return pollSeconds;
     }
 
 }
