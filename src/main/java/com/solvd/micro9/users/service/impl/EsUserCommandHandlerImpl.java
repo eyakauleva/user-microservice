@@ -39,7 +39,8 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
     public EsUserCommandHandlerImpl(final EsUserRepository esUserRepository,
                                     final KfProducer<String, Es> producer,
                                     final ReactiveRedisOperations<String, User> operations,
-                                    final Map<EsType, Function<Es, Mono<?>>> dbSynchronizerHandler) {
+                                    final Map<EsType, Function<Es, Mono<?>>>
+                                            dbSynchronizerHandler) {
         this.esUserRepository = esUserRepository;
         this.producer = producer;
         this.cache = operations.opsForHash();
@@ -69,7 +70,6 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
                             )
                             .subscribeOn(Schedulers.boundedElastic())
                             .subscribe();
-//                    synchronizer.sync(createdEvent);
                     dbSynchronizerHandler.get(createdEvent.getType()).apply(createdEvent)
                             .subscribeOn(Schedulers.boundedElastic())
                             .subscribe();
@@ -123,7 +123,8 @@ public class EsUserCommandHandlerImpl implements EsUserCommandHandler {
                                                 )
                                                 .subscribeOn(Schedulers.boundedElastic())
                                                 .subscribe();
-                                        dbSynchronizerHandler.get(completeEvent.getType()).apply(completeEvent)
+                                        dbSynchronizerHandler.get(completeEvent.getType())
+                                                .apply(completeEvent)
                                                 .subscribeOn(Schedulers.boundedElastic())
                                                 .subscribe();
                                     }
