@@ -36,38 +36,29 @@ public class UserServiceTest {
 
     @Test
     public void verifyUserIsCreatedTest() {
-        //given
         String userId = "1111";
         User user = new User(userId, "Liza", "Ya", "email@gmail.com", true);
         User savedUser = new User(userId, "Liza", "Ya", "email@gmail.com", false);
         String payload = new Gson().toJson(user);
-        Es eventStore = new Es(1L, EsType.USER_CREATED, LocalDateTime.now(), "Liza", userId, payload, EsStatus.SUBMITTED);
-
+        Es eventStore = new Es(1L, EsType.USER_CREATED, LocalDateTime.now(),
+                "Liza", userId, payload, EsStatus.SUBMITTED
+        );
         Mockito.when(userRepository.save(user)).thenReturn(Mono.just(savedUser));
-
-        //when
         Mono<User> createdUser = userService.create(eventStore);
-
-        //then
         StepVerifier.create(createdUser)
                 .expectNext(savedUser)
                 .verifyComplete();
-
         verify(producer, only()).send(userId, savedUser);
     }
 
     @Test
     public void verifyUserIsDeleted() {
-        //given
         String userId = "1111";
-        Es eventStore = new Es(1L, EsType.USER_DELETED, LocalDateTime.now(), "Liza", userId, null, EsStatus.SUBMITTED);
-
+        Es eventStore = new Es(1L, EsType.USER_DELETED, LocalDateTime.now(),
+                "Liza", userId, null, EsStatus.SUBMITTED
+        );
         Mockito.when(userRepository.deleteById(userId)).thenReturn(Mono.empty());
-
-        //when
         Mono<Void> result = userService.delete(eventStore);
-
-        //then
         StepVerifier.create(result)
                 .verifyComplete();
 

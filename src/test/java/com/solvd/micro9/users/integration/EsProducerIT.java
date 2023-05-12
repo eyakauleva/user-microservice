@@ -29,7 +29,7 @@ import java.util.UUID;
 @DirtiesContext
 public class EsProducerIT extends TestcontainersTest {
 
-    private final static String TOPIC = "users";
+    private static final String TOPIC = "users";
 
     @Autowired
     private EsProducer producer;
@@ -47,12 +47,16 @@ public class EsProducerIT extends TestcontainersTest {
                 .payload(payload)
                 .status(EsStatus.SUBMITTED)
                 .build();
-        try (Consumer<String, Es> consumer = new KafkaConsumer<>(getConsumerProps(Es.class))) {
+        try (Consumer<String, Es> consumer = new KafkaConsumer<>(
+                getConsumerProps(Es.class)
+        )) {
             consumer.subscribe(Collections.singleton(TOPIC));
             producer.send(event.getType().toString(), event);
             ConsumerRecords<String, Es> records = consumer.poll(Duration.ofSeconds(5));
             ConsumerRecord<String, Es> record = records.iterator().next();
-            Es result = getObjectMapper().readValue(String.valueOf(record.value()), EsUser.class);
+            Es result = getObjectMapper().readValue(
+                    String.valueOf(record.value()), EsUser.class
+            );
             Assertions.assertEquals(1, records.count());
             Assertions.assertEquals(event, result);
         }
