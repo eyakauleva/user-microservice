@@ -1,5 +1,7 @@
 package com.solvd.micro9.users.messaging;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.Gson;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.es.Es;
@@ -14,15 +16,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
-import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -30,15 +36,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 @SpringBootTest
-@TestPropertySource(properties = {"ticket-service = localhost:9090"})
 @DirtiesContext
-@EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
+@Testcontainers
 public class EsProducerTest {
 
     private final static String TOPIC = "users";
 
-    @Autowired
-    private EmbeddedKafkaBroker embeddedKafka;
+    @Container
+    public static KafkaContainer kafkaContainer = new KafkaContainer(
+            DockerImageName.parse("confluentinc/cp-kafka:7.3.0")
+    );
+
+    @DynamicPropertySource
+    static void kafkaProperties(DynamicPropertyRegistry registry) {
+        registry.add("ticket-service", () -> "localhost:9090");
+        registry.add("spring.kafka.bootstrap-servers", kafkaContainer::getBootstrapServers);
+    }
 
     @Autowired
     private EsProducer producer;
@@ -58,12 +71,7 @@ public class EsProducerTest {
                 .status(EsStatus.SUBMITTED)
                 .build();
 
-        Map<String, Object> consumerProps = KafkaTestUtils
-                .consumerProps("test-group", "true", embeddedKafka);
-        consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        consumerProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, com.solvd.micro9.users.domain.es.Es.class);
-        try (Consumer<String, Es> consumer = new KafkaConsumer<>(consumerProps)) {
+        try (Consumer<String, Es> consumer = new KafkaConsumer<>(getConsumerProps())) {
             consumer.subscribe(Collections.singleton(TOPIC));
 
             //when
@@ -75,8 +83,25 @@ public class EsProducerTest {
             assertEquals(1, records.count());
 
             ConsumerRecord<String, Es> record = records.iterator().next();
-            assertEquals(event.toString(), record.value().toString());
+
+            ObjectMapper mapper = new ObjectMapper();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+            mapper.registerModule(new JavaTimeModule());
+            mapper.setDateFormat(dateFormat);
+
+            Es result = mapper.readValue(String.valueOf(record.value()), EsUser.class);
+            assertEquals(event, result);
         }
+    }
+
+    private Map<String, Object> getConsumerProps() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, com.solvd.micro9.users.domain.es.Es.class);
+        return props;
     }
 
 }

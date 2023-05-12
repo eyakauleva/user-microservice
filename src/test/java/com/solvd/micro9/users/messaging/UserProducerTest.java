@@ -42,7 +42,6 @@ public class UserProducerTest {
     static void kafkaProperties(DynamicPropertyRegistry registry) {
         registry.add("ticket-service", () -> "localhost:9090");
         registry.add("spring.kafka.bootstrap-servers", kafkaContainer::getBootstrapServers);
-        registry.add("spring.kafka.producer.value-serializer", () -> JsonSerializer.class);
     }
 
     @Autowired
