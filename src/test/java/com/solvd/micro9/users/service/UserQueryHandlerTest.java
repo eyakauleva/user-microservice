@@ -75,7 +75,6 @@ public class UserQueryHandlerTest {
     @Test
     public void verifyUserIsFoundByIdFromDbTest() {
         User user = TestUtils.getUser();
-        System.out.println("0001: " + user.getId());
         EsUserQuery query = new EsUserQuery(user.getId());
         Mockito.when(userRepository.findById(user.getId())).thenReturn(Mono.just(user));
         Mockito.when(cache.get(RedisConfig.CACHE_KEY, query.getId()))

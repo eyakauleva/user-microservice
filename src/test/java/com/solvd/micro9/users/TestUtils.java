@@ -18,7 +18,7 @@ public final class TestUtils {
     }
 
     public static ElstcUser getElstcUser() {
-        return new ElstcUser("Liza Ya", "+12345",
+        return new ElstcUser("1111", "Liza Ya", "+12345",
                 20, Gender.FEMALE, 170.5f, 50.2f, EyesColor.BLUE,
                 new StudyYears(2015, 2018));
     }

@@ -31,13 +31,12 @@ public class UserProducerIT extends TestcontainersTest {
 
     @Test
     public void verifyMessageSentToKafkaTest() {
-        String userId = "111";
         ElstcUser user = TestUtils.getElstcUser();
         try (Consumer<String, User> consumer = new KafkaConsumer<>(
                 getConsumerProps(User.class)
         )) {
             consumer.subscribe(Collections.singleton(TOPIC));
-            producer.send(userId, user);
+            producer.send(user.getId(), user);
             ConsumerRecords<String, User> records = consumer.poll(Duration.ofSeconds(5));
             ConsumerRecord<String, User> record = records.iterator().next();
             ElstcUser result = new Gson().fromJson(

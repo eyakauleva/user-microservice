@@ -29,6 +29,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user)
                 .doOnNext(savedUser -> {
                     ElstcUser elstcUser = new ElstcUser(
+                            savedUser.getId(),
                             savedUser.getFirstName() + " " + savedUser.getLastName(),
                             savedUser.getPhone(),
                             savedUser.getAge(),
