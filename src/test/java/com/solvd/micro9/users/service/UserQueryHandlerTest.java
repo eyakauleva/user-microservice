@@ -1,7 +1,6 @@
 package com.solvd.micro9.users.service;
 
-import com.solvd.micro9.users.domain.aggregate.EyesColor;
-import com.solvd.micro9.users.domain.aggregate.Gender;
+import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.exception.ResourceDoesNotExistException;
 import com.solvd.micro9.users.domain.query.EsUserQuery;
@@ -47,9 +46,7 @@ public class UserQueryHandlerTest {
     @Test
     @Order(1)
     public void verifyAllExistingUsersAreFoundInDbTest() {
-        User user = new User("1111", "Liza", "Ya", "email@gmail.com",
-                "+12345", 20, Gender.FEMALE, 170.5f,
-                50.2f, EyesColor.BLUE, false);
+        User user = TestUtils.getUser();
         Flux<User> allUsers = Flux.just(user);
         Mockito.when(userRepository.findAll()).thenReturn(allUsers);
         Mockito.when(cache.put(RedisConfig.CACHE_KEY, user.getId(), user))
@@ -63,9 +60,7 @@ public class UserQueryHandlerTest {
     @Test
     @Order(2)
     public void verifyAllExistingUsersAreFoundInCacheTest() {
-        User user = new User("1111", "Liza", "Ya", "email@gmail.com",
-                "+12345", 20, Gender.FEMALE, 170.5f,
-                50.2f, EyesColor.BLUE, false);
+        User user = TestUtils.getUser();
         Map.Entry<String, User> allUsersEntry = new AbstractMap.SimpleEntry<>(
                 "test", user
         );
@@ -79,12 +74,10 @@ public class UserQueryHandlerTest {
 
     @Test
     public void verifyUserIsFoundByIdFromDbTest() {
-        String userId = "1111";
-        User user = new User("1111", "Liza", "Ya", "email@gmail.com",
-                "+12345", 20, Gender.FEMALE, 170.5f,
-                50.2f, EyesColor.BLUE, false);
-        EsUserQuery query = new EsUserQuery(userId);
-        Mockito.when(userRepository.findById(userId)).thenReturn(Mono.just(user));
+        User user = TestUtils.getUser();
+        System.out.println("0001: " + user.getId());
+        EsUserQuery query = new EsUserQuery(user.getId());
+        Mockito.when(userRepository.findById(user.getId())).thenReturn(Mono.just(user));
         Mockito.when(cache.get(RedisConfig.CACHE_KEY, query.getId()))
                 .thenReturn(Mono.empty());
         Mockito.when(cache.put(RedisConfig.CACHE_KEY, user.getId(), user))
@@ -97,11 +90,8 @@ public class UserQueryHandlerTest {
 
     @Test
     public void verifyUserIsFoundByIdFromCacheTest() {
-        String userId = "1111";
-        User user = new User("1111", "Liza", "Ya", "email@gmail.com",
-                "+12345", 20, Gender.FEMALE, 170.5f,
-                50.2f, EyesColor.BLUE, false);
-        EsUserQuery query = new EsUserQuery(userId);
+        User user = TestUtils.getUser();
+        EsUserQuery query = new EsUserQuery(user.getId());
         Mockito.when(cache.get(RedisConfig.CACHE_KEY, query.getId()))
                 .thenReturn(Mono.just(user));
         Mono<User> foundUser = queryHandler.findById(query);

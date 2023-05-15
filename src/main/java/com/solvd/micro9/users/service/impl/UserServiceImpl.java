@@ -2,6 +2,8 @@ package com.solvd.micro9.users.service.impl;
 
 import com.google.gson.Gson;
 import com.solvd.micro9.users.domain.aggregate.User;
+import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
+import com.solvd.micro9.users.domain.elasticsearch.StudyYears;
 import com.solvd.micro9.users.domain.es.Es;
 import com.solvd.micro9.users.messaging.KfProducer;
 import com.solvd.micro9.users.persistence.snapshot.UserRepository;
@@ -17,7 +19,7 @@ import reactor.core.publisher.Mono;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final KfProducer<String, User> producer;
+    private final KfProducer<String, ElstcUser> producer;
 
     @Override
     public Mono<User> create(final Es eventStore) {
@@ -25,7 +27,21 @@ public class UserServiceImpl implements UserService {
         user.setId(eventStore.getEntityId());
         user.setNew(true);
         return userRepository.save(user)
-                .doOnNext(savedUser -> producer.send(savedUser.getId(), savedUser));
+                .doOnNext(savedUser -> {
+                    ElstcUser elstcUser = new ElstcUser(
+                            savedUser.getFirstName() + " " + savedUser.getLastName(),
+                            savedUser.getPhone(),
+                            savedUser.getAge(),
+                            savedUser.getGender(),
+                            savedUser.getHeight(),
+                            savedUser.getWeight(),
+                            savedUser.getEyesColor(),
+                            new StudyYears(
+                                    savedUser.getStartStudyYear(),
+                                    savedUser.getEndStudyYear()
+                            ));
+                    producer.send(savedUser.getId(), elstcUser);
+                });
     }
 
     @Override

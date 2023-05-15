@@ -34,4 +34,8 @@ public class UserDto {
 
     private EyesColor eyesColor;
 
+    private int startStudyYear;
+
+    private int endStudyYear;
+
 }

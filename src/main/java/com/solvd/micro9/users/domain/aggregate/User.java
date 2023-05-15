@@ -36,7 +36,14 @@ public class User implements Persistable<String> {
 
     private float weight;
 
+    @Field("eyes_color")
     private EyesColor eyesColor;
+
+    @Field("start_study_year")
+    private int startStudyYear;
+
+    @Field("end_study_year")
+    private int endStudyYear;
 
     @Transient
     private boolean isNew;

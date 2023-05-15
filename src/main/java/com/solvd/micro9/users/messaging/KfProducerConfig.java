@@ -1,6 +1,6 @@
 package com.solvd.micro9.users.messaging;
 
-import com.solvd.micro9.users.domain.aggregate.User;
+import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
 import com.solvd.micro9.users.domain.es.Es;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +53,7 @@ public class KfProducerConfig {
     }
 
     @Bean
-    public ReactiveKafkaProducerTemplate<String, User> syncProducer(
+    public ReactiveKafkaProducerTemplate<String, ElstcUser> syncProducer(
             final KafkaProperties properties
     ) {
         Map<String, Object> props = properties.buildProducerProperties();
