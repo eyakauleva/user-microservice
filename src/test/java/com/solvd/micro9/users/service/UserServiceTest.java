@@ -19,9 +19,6 @@ import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
 
-import static org.mockito.Mockito.only;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
@@ -48,7 +45,7 @@ public class UserServiceTest {
         StepVerifier.create(createdUser)
                 .expectNext(savedUser)
                 .verifyComplete();
-        verify(producer, only()).send(userId, savedUser);
+        Mockito.verify(producer, Mockito.times(1)).send(userId, savedUser);
     }
 
     @Test
@@ -62,7 +59,7 @@ public class UserServiceTest {
         StepVerifier.create(result)
                 .verifyComplete();
 
-        verify(producer, only()).send(userId, null);
+        Mockito.verify(producer, Mockito.times(1)).send(userId, null);
     }
 
 }

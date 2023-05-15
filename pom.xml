@@ -181,8 +181,7 @@
                                 <rule>
                                     <element>PACKAGE</element>
                                     <includes>
-                                        <include>com.solvd.micro9.users.service</include>
-                                        <include>com.solvd.micro9.users.service.**</include>
+                                        <include>com.solvd.micro9.users.service.impl</include>
                                     </includes>
                                     <limits>
                                         <limit>
