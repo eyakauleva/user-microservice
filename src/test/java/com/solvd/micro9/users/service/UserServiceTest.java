@@ -20,7 +20,7 @@ import reactor.test.StepVerifier;
 import java.time.LocalDateTime;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -32,7 +32,7 @@ public class UserServiceTest {
     private UserServiceImpl userService;
 
     @Test
-    public void verifyUserIsCreatedTest() {
+    void verifyUserIsCreatedTest() {
         String userId = "1111";
         User user = new User(userId, "Liza", "Ya", "email@gmail.com", true);
         User savedUser = new User(userId, "Liza", "Ya", "email@gmail.com", false);
@@ -49,7 +49,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void verifyUserIsDeleted() {
+    void verifyUserIsDeleted() {
         String userId = "1111";
         Es eventStore = new Es(1L, EsType.USER_DELETED, LocalDateTime.now(),
                 "Liza", userId, null, EsStatus.SUBMITTED

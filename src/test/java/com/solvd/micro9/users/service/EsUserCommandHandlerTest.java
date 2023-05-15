@@ -15,7 +15,6 @@ import com.solvd.micro9.users.service.cache.RedisConfig;
 import com.solvd.micro9.users.service.impl.EsUserCommandHandlerImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -31,8 +30,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class EsUserCommandHandlerTest {
+class EsUserCommandHandlerTest {
 
     private EsUserRepository esUserRepository;
     private KfProducer<String, Es> producer;
@@ -41,7 +39,7 @@ public class EsUserCommandHandlerTest {
     private EsUserCommandHandlerImpl commandHandler;
 
     @BeforeEach
-    public void init() {
+    void init() {
         this.esUserRepository = Mockito.mock(EsUserRepository.class);
         this.producer = Mockito.mock(KfProducer.class);
         ReactiveRedisOperations<String, User> operations =
@@ -55,7 +53,7 @@ public class EsUserCommandHandlerTest {
     }
 
     @Test
-    public void verifyCreateUserCommandIsAppliedTest() {
+    void verifyCreateUserCommandIsAppliedTest() {
         User user = new User("1111", "Liza", "Ya", "email@gmail.com", false);
         CreateUserCommand command = new CreateUserCommand(user, "Liza");
         String payload = new Gson().toJson(command.getUser());
@@ -90,7 +88,7 @@ public class EsUserCommandHandlerTest {
     }
 
     @Test
-    public void verifyDeleteUserCommandIsAppliedTest() {
+    void verifyDeleteUserCommandIsAppliedTest() {
         DeleteUserCommand command = new DeleteUserCommand("111", "Liza");
         EsUser createdEvent = EsUser.builder()
                 .id(999L)
@@ -111,7 +109,7 @@ public class EsUserCommandHandlerTest {
     }
 
     @Test
-    public void verifyCompleteTransactionCommandIsAppliedTest() {
+    void verifyCompleteTransactionCommandIsAppliedTest() {
         CompleteTransactionCommand command =
                 new CompleteTransactionCommand("12345", EsStatus.SUBMITTED);
         EsUser event = EsUser.builder()

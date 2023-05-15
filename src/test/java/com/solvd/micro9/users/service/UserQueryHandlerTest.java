@@ -6,10 +6,8 @@ import com.solvd.micro9.users.domain.query.EsUserQuery;
 import com.solvd.micro9.users.persistence.snapshot.UserRepository;
 import com.solvd.micro9.users.service.cache.RedisConfig;
 import com.solvd.micro9.users.service.impl.UserQueryHandlerImpl;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,8 +21,7 @@ import java.util.AbstractMap;
 import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class UserQueryHandlerTest {
+class UserQueryHandlerTest {
 
     private UserRepository userRepository;
 
@@ -32,8 +29,8 @@ public class UserQueryHandlerTest {
 
     private UserQueryHandlerImpl queryHandler;
 
-    @BeforeAll
-    public void init() {
+    @BeforeEach
+    void init() {
         this.userRepository = Mockito.mock(UserRepository.class);
         ReactiveRedisOperations<String, User> operations =
                 Mockito.mock(ReactiveRedisOperations.class);
@@ -43,8 +40,7 @@ public class UserQueryHandlerTest {
     }
 
     @Test
-    @Order(1)
-    public void verifyAllExistingUsersAreFoundInDbTest() {
+    void verifyAllExistingUsersAreFoundInDbTest() {
         User user = new User("1111", "Liza", "Ya", "email@gmail.com", false);
         Flux<User> allUsers = Flux.just(user);
         Mockito.when(userRepository.findAll()).thenReturn(allUsers);
@@ -57,14 +53,15 @@ public class UserQueryHandlerTest {
     }
 
     @Test
-    @Order(2)
-    public void verifyAllExistingUsersAreFoundInCacheTest() {
+    void verifyAllExistingUsersAreFoundInCacheTest() {
         User user = new User("1111", "Liza", "Ya", "email@gmail.com", false);
         Map.Entry<String, User> allUsersEntry = new AbstractMap.SimpleEntry<>(
                 "test", user
         );
         Mockito.when(cache.entries(RedisConfig.CACHE_KEY))
                 .thenReturn(Flux.just(allUsersEntry));
+        Mockito.when(userRepository.findAll()).thenReturn(Flux.empty());
+        queryHandler.getAll(); //sets areAllUsersInCache flag to true
         Flux<User> userFluxFromCache = queryHandler.getAll();
         StepVerifier.create(userFluxFromCache)
                 .expectNext(user)
@@ -72,7 +69,7 @@ public class UserQueryHandlerTest {
     }
 
     @Test
-    public void verifyUserIsFoundByIdFromDbTest() {
+    void verifyUserIsFoundByIdFromDbTest() {
         String userId = "1111";
         User user = new User(userId, "Liza", "Ya", "email@gmail.com", false);
         EsUserQuery query = new EsUserQuery(userId);
@@ -88,7 +85,7 @@ public class UserQueryHandlerTest {
     }
 
     @Test
-    public void verifyUserIsFoundByIdFromCacheTest() {
+    void verifyUserIsFoundByIdFromCacheTest() {
         String userId = "1111";
         User user = new User(userId, "Liza", "Ya", "email@gmail.com", false);
         EsUserQuery query = new EsUserQuery(userId);
@@ -101,7 +98,7 @@ public class UserQueryHandlerTest {
     }
 
     @Test
-    public void verifyUserIsNotFoundByIdTest() {
+    void verifyUserIsNotFoundByIdTest() {
         String userId = "1111";
         EsUserQuery query = new EsUserQuery(userId);
         Mockito.when(userRepository.findById(userId)).thenReturn(Mono.empty());
