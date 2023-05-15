@@ -1,6 +1,8 @@
 package com.solvd.micro9.users.integration;
 
 import com.google.gson.Gson;
+import com.solvd.micro9.users.domain.aggregate.EyesColor;
+import com.solvd.micro9.users.domain.aggregate.Gender;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.messaging.UserProducer;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +31,9 @@ public class UserProducerIT extends TestcontainersTest {
 
     @Test
     public void verifyMessageSentToKafkaTest() {
-        User user = new User("9999", "Liza", "Ya", "email@gmail.com", false);
+        User user = new User("1111", "Liza", "Ya", "email@gmail.com",
+                "+12345", 20, Gender.FEMALE, 170.5f,
+                50.2f, EyesColor.BLUE, false);
         try (Consumer<String, User> consumer = new KafkaConsumer<>(
                 getConsumerProps(User.class)
         )) {

@@ -1,6 +1,8 @@
 package com.solvd.micro9.users.integration;
 
 import com.google.gson.Gson;
+import com.solvd.micro9.users.domain.aggregate.EyesColor;
+import com.solvd.micro9.users.domain.aggregate.Gender;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.es.Es;
 import com.solvd.micro9.users.domain.es.EsStatus;
@@ -37,7 +39,9 @@ public class EsProducerIT extends TestcontainersTest {
     @Test
     @SneakyThrows
     public void verifyMessageSentToKafkaTest() {
-        User user = new User("1111", "Liza", "Ya", "email@gmail.com", false);
+        User user = new User("1111", "Liza", "Ya", "email@gmail.com",
+                "+12345", 20, Gender.FEMALE, 170.5f,
+                50.2f, EyesColor.BLUE, false);
         String payload = new Gson().toJson(user);
         Es event = EsUser.builder()
                 .type(EsType.USER_CREATED)

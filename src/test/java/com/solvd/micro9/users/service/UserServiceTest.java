@@ -1,6 +1,8 @@
 package com.solvd.micro9.users.service;
 
 import com.google.gson.Gson;
+import com.solvd.micro9.users.domain.aggregate.EyesColor;
+import com.solvd.micro9.users.domain.aggregate.Gender;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.es.Es;
 import com.solvd.micro9.users.domain.es.EsStatus;
@@ -34,8 +36,12 @@ public class UserServiceTest {
     @Test
     public void verifyUserIsCreatedTest() {
         String userId = "1111";
-        User user = new User(userId, "Liza", "Ya", "email@gmail.com", true);
-        User savedUser = new User(userId, "Liza", "Ya", "email@gmail.com", false);
+        User user = new User(userId, "Liza", "Ya", "email@gmail.com",
+                "+12345", 20, Gender.FEMALE, 170.5f,
+                50.2f, EyesColor.BLUE, true);
+        User savedUser = new User(userId, "Liza", "Ya", "email@gmail.com",
+                "+12345", 20, Gender.FEMALE, 170.5f,
+                50.2f, EyesColor.BLUE, false);
         String payload = new Gson().toJson(user);
         Es eventStore = new Es(1L, EsType.USER_CREATED, LocalDateTime.now(),
                 "Liza", userId, payload, EsStatus.SUBMITTED

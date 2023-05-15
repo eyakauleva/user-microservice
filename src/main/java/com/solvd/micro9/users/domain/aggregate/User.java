@@ -26,6 +26,18 @@ public class User implements Persistable<String> {
 
     private String email;
 
+    private String phone;
+
+    private int age;
+
+    private Gender gender;
+
+    private float height;
+
+    private float weight;
+
+    private EyesColor eyesColor;
+
     @Transient
     private boolean isNew;
 

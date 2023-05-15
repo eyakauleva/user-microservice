@@ -1,5 +1,7 @@
 package com.solvd.micro9.users.web.dto;
 
+import com.solvd.micro9.users.domain.aggregate.EyesColor;
+import com.solvd.micro9.users.domain.aggregate.Gender;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,5 +20,18 @@ public class UserDto {
 
     @NotBlank(message = "User's email cannot be empty")
     private String email;
+
+    @NotBlank(message = "User's phone cannot be empty")
+    private String phone;
+
+    private int age;
+
+    private Gender gender;
+
+    private float height;
+
+    private float weight;
+
+    private EyesColor eyesColor;
 
 }
