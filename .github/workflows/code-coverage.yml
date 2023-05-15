@@ -20,6 +20,10 @@ jobs:
         run: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       - name: Run tests and collect coverage
         run: mvn -B test
+      - name: Check Location
+        run: pwd
+      - name: Check files
+        run: ls
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
