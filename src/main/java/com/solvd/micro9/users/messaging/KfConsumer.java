@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.reactive.ReactiveKafkaConsumerTemplate;
 import org.springframework.stereotype.Component;
+import reactor.core.scheduler.Schedulers;
 
 @Component
 @Slf4j
@@ -36,7 +37,9 @@ public class KfConsumer {
                                         ticket.getUserId(),
                                         record.value().getStatus()
                                 );
-                        commandHandler.apply(command);
+                        commandHandler.apply(command)
+                                .subscribeOn(Schedulers.boundedElastic())
+                                .subscribe();
                     }
                     record.receiverOffset().acknowledge();
                 });
