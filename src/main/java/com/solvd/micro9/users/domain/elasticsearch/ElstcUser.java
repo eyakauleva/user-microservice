@@ -17,7 +17,7 @@ public class ElstcUser {
     @Id
     private String id;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text, name = "full_name")
     private String fullName;
 
     @Field(type = FieldType.Keyword)
@@ -35,10 +35,10 @@ public class ElstcUser {
     @Field(type = FieldType.Float)
     private float weight;
 
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Keyword, name = "eyes_color")
     private EyesColor eyesColor;
 
-    @Field(type = FieldType.Integer_Range)
+    @Field(type = FieldType.Integer_Range, name = "study_years")
     private StudyYears studyYears;
 
 }

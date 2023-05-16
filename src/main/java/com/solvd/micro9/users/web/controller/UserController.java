@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.command.CreateUserCommand;
 import com.solvd.micro9.users.domain.command.DeleteUserCommand;
+import com.solvd.micro9.users.domain.criteria.UserCriteria;
 import com.solvd.micro9.users.domain.es.EsUser;
 import com.solvd.micro9.users.domain.query.EsUserQuery;
 import com.solvd.micro9.users.service.EsUserCommandHandler;
@@ -15,6 +16,8 @@ import com.solvd.micro9.users.web.dto.EsDto;
 import com.solvd.micro9.users.web.dto.EventDto;
 import com.solvd.micro9.users.web.dto.TicketDto;
 import com.solvd.micro9.users.web.dto.UserDto;
+import com.solvd.micro9.users.web.dto.criteria.UserCriteriaDto;
+import com.solvd.micro9.users.web.mapper.UserCriteriaMapper;
 import com.solvd.micro9.users.web.mapper.UserMapper;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -42,17 +38,24 @@ public class UserController {
 
     @Value("${ticket-service}")
     private String ticketService;
-
     private final EsUserCommandHandler commandHandler;
     private final UserQueryHandler queryHandler;
     private final UserMapper userMapper;
     private final WebClient.Builder webClientBuilder;
+    private final UserCriteriaMapper criteriaMapper;
     private static final String USER_SERVICE = "user-service";
 
     @GetMapping
     public Flux<UserDto> getAll() {
         Flux<User> users = queryHandler.getAll();
         return userMapper.domainToDto(users);
+    }
+
+    @GetMapping(value = "/search")
+    public Flux<UserDto> findByCriteria(UserCriteriaDto criteriaDto) {
+        UserCriteria criteria = criteriaMapper.dtoToDomain(criteriaDto);
+        Flux<User> userFlux = queryHandler.findByCriteria(criteria);
+        return userMapper.domainToDto(userFlux);
     }
 
     @GetMapping(value = "/{id}")
@@ -99,7 +102,7 @@ public class UserController {
                                     );
                                     handler.error(new BadRequestException(exceptionBody));
                                 }
-                                )
+                        )
                 )
                 .bodyToMono(EsDto.class);
     }
