@@ -1,5 +1,5 @@
 {
-  "name": "elasticsearch-sink-02",
+  "name": "elasticsearch-sink-17",
   "config": {
     "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
     "tasks.max": "1",
@@ -9,6 +9,9 @@
     "behavior.on.null.values": "delete",
     "connection.url": "http://elasticsearch:9200",
     "connection.username": "elastic",
-    "connection.password": "changeme"
+    "connection.password": "changeme",
+    "transforms": "renameFields",
+    "transforms.renameFields.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.renameFields.renames": "fullName:full_name,eyesColor:eyes_color,studyYears:study_years"
   }
 }

@@ -1,0 +1,30 @@
+{
+  "mappings": {
+    "properties" : {
+      "full_name": {
+        "type": "text"
+      },
+      "phone": {
+        "type": "keyword"
+      },
+      "age": {
+        "type": "integer"
+      },
+      "gender": {
+        "type" : "keyword"
+      },
+      "height": {
+        "type": "float"
+      },
+      "weight": {
+        "type": "float"
+      },
+      "eyes_color": {
+        "type" : "keyword"
+      },
+      "study_years": {
+        "type" : "integer_range"
+      }
+    }
+  }
+}

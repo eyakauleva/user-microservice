@@ -84,11 +84,16 @@ otherwise set their service names
 2. Create kafka-connector by sending a POST request to ```http://localhost:8083/connectors``` url <br/>
 with body like in ```src/infra/kafka-connect-elastic/kafka-elastic-connector.json``` example <br/>
    (kafka topic and elasticsearch index will have the same name mentioned in ```topics``` field) <br/>
-3. Send messages to kafka
+Kafka connector also transforms some fields names (! kafka connector is unable to transform nested fields !)
+3. Create mapping for elasticsearch by sending a PUT request to ```http://localhost:9200/syncmongoelastic``` url <br/>
+with body like in ```src/infra/kafka-connect-elastic/elastic-mapping.json``` example <br/>
+4. Send messages to kafka
 
 To list all connectors make a GET request to ```http://localhost:8083/connectors``` <br/>
 To delete a connecter make a DELETE-request to ```http://localhost:8083/connectors/<connector-name>``` <br/>
 To get connector status make a GET request to ```http://localhost:8083/connectors/<connector-name>/tasks/0/status``` <br/>
+
+To get index mapping make a GET request to ```http://localhost:9200/<index-name>/_mapping``` <br/>
 
 ***CAUTION:*** if you want to change your connector config (after you already created it), <br/>
 you have to delete the existing one and create a new one with changed configs and
