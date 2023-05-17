@@ -1,7 +1,7 @@
 package com.solvd.micro9.users.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.es.Es;
 import com.solvd.micro9.users.domain.es.EsStatus;
@@ -33,6 +33,9 @@ class EsProducerIT extends TestcontainersTest {
     private static final String TOPIC = "users";
 
     @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private EsProducer producer;
 
     @Test
@@ -55,7 +58,7 @@ class EsProducerIT extends TestcontainersTest {
             producer.send(event.getType().toString(), event);
             ConsumerRecords<String, Es> records = consumer.poll(Duration.ofSeconds(5));
             ConsumerRecord<String, Es> record = records.iterator().next();
-            Es result = TestUtils.getObjectMapper().readValue(
+            Es result = objectMapper.readValue(
                     String.valueOf(record.value()), EsUser.class
             );
             Assertions.assertEquals(1, records.count());
