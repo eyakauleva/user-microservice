@@ -40,7 +40,7 @@ public class ElstcUser {
     @Field(type = FieldType.Keyword, name = "eyes_color")
     private EyesColor eyesColor;
 
-    //@Field(type = FieldType.Integer_Range, name = "study_years")
+    @Field(type = FieldType.Integer_Range, name = "study_years")
     private StudyYears studyYears;
 
 }
