@@ -5,7 +5,6 @@ import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.command.CreateUserCommand;
 import com.solvd.micro9.users.domain.command.DeleteUserCommand;
 import com.solvd.micro9.users.domain.criteria.UserCriteria;
-import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
 import com.solvd.micro9.users.domain.es.EsUser;
 import com.solvd.micro9.users.domain.query.EsUserQuery;
 import com.solvd.micro9.users.service.EsUserCommandHandler;
@@ -61,11 +60,10 @@ public class UserController {
     }
 
     @GetMapping(value = "/search")
-    public Flux<ElstcUser> findByCriteria(final UserCriteriaDto criteriaDto, final Pageable pageable) {
+    public Flux<UserDto> findByCriteria(final UserCriteriaDto criteriaDto, final Pageable pageable) {
         UserCriteria criteria = criteriaMapper.dtoToDomain(criteriaDto);
-        Flux<ElstcUser> userFlux = queryHandler.findByCriteria(criteria, pageable);
-        return userFlux;
-        //return userMapper.domainToDto(userFlux); //TODO
+        Flux<User> userFlux = queryHandler.findByCriteria(criteria, pageable);
+        return userMapper.domainToDto(userFlux);
     }
 
     @GetMapping(value = "/{id}")

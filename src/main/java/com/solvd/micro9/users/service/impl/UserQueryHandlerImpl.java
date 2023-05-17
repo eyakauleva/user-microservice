@@ -1,6 +1,5 @@
 package com.solvd.micro9.users.service.impl;
 
-import com.solvd.micro9.users.domain.aggregate.Gender;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.criteria.UserCriteria;
 import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
@@ -11,14 +10,10 @@ import com.solvd.micro9.users.service.UserQueryHandler;
 import com.solvd.micro9.users.service.cache.RedisConfig;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
-import org.springframework.data.elasticsearch.core.query.CriteriaQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
@@ -27,8 +22,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -63,11 +56,13 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
     }
 
     @Override
-    public Flux<ElstcUser> findByCriteria(UserCriteria criteria, Pageable pageable) {
+    public Flux<User> findByCriteria(UserCriteria criteria, Pageable pageable) {
         Criteria elstcCriteria = prepareCriteria(criteria);
         Query query = new CriteriaQuery(elstcCriteria).setPageable(pageable);
         return elasticOperations.search(query, ElstcUser.class)
-                .map(SearchHit::getContent); //TODO get from mongo
+                .flatMap(elasticHit -> this.findById(
+                        new EsUserQuery(elasticHit.getContent().getId()))
+                );
     }
 
     @Override
@@ -126,11 +121,11 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
         }
         if (criteriaData.getEyesColors() != null
                 && criteriaData.getEyesColors().size() > 0) {
-            searchCriteria.and(Criteria.where("eyesColor")
+            searchCriteria.and(Criteria.where("eyes_color")
                     .in(criteriaData.getEyesColors()));
         }
         if (criteriaData.getStudyYear() != null) {
-            searchCriteria.and(Criteria.where("studyYears")
+            searchCriteria.and(Criteria.where("study_years")
                     .is(criteriaData.getStudyYear()));
         }
         return searchCriteria;
