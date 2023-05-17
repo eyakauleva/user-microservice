@@ -60,7 +60,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/search")
-    public Flux<UserDto> findByCriteria(final UserCriteriaDto criteriaDto, final Pageable pageable) {
+    public Flux<UserDto> findByCriteria(final UserCriteriaDto criteriaDto,
+                                        final Pageable pageable) {
         UserCriteria criteria = criteriaMapper.dtoToDomain(criteriaDto);
         Flux<User> userFlux = queryHandler.findByCriteria(criteria, pageable);
         return userMapper.domainToDto(userFlux);

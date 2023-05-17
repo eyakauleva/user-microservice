@@ -19,7 +19,7 @@ public class WebConfig implements WebFluxConfigurer {
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
 
     @Override
-    public void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {
+    public void configureArgumentResolvers(final ArgumentResolverConfigurer configurer) {
         configurer.addCustomResolver(new ReactivePageableHandlerMethodArgumentResolver());
     }
 

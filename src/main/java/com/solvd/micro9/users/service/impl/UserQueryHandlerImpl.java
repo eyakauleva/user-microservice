@@ -34,10 +34,10 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
     private boolean areAllUsersInCache = false;
 
     public UserQueryHandlerImpl(final UserRepository userRepository,
-                                final ReactiveRedisOperations<String, User> redisOperations,
+                                final ReactiveRedisOperations<String, User> rdsOperations,
                                 final ReactiveElasticsearchOperations elasticOperations) {
         this.userRepository = userRepository;
-        this.cache = redisOperations.opsForHash();
+        this.cache = rdsOperations.opsForHash();
         this.elasticOperations = elasticOperations;
     }
 
@@ -56,7 +56,8 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
     }
 
     @Override
-    public Flux<User> findByCriteria(UserCriteria criteria, Pageable pageable) {
+    public Flux<User> findByCriteria(final UserCriteria criteria,
+                                     final Pageable pageable) {
         Criteria elstcCriteria = prepareCriteria(criteria);
         Query query = new CriteriaQuery(elstcCriteria).setPageable(pageable);
         return elasticOperations.search(query, ElstcUser.class)
@@ -84,7 +85,7 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
                         .thenReturn(user));
     }
 
-    private Criteria prepareCriteria(UserCriteria criteriaData) {
+    private Criteria prepareCriteria(final UserCriteria criteriaData) {
         Criteria searchCriteria = new Criteria();
         if (criteriaData.getName() != null) {
             searchCriteria.and(Criteria.where("full_name")
