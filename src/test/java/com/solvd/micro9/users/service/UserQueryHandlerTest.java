@@ -14,6 +14,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import reactor.core.publisher.Flux;
@@ -31,16 +33,21 @@ public class UserQueryHandlerTest {
 
     private ReactiveHashOperations<String, String, User> cache;
 
+    private ReactiveElasticsearchOperations elasticOperations;
+
     private UserQueryHandlerImpl queryHandler;
 
     @BeforeAll
     public void init() {
         this.userRepository = Mockito.mock(UserRepository.class);
-        ReactiveRedisOperations<String, User> operations =
+        ReactiveRedisOperations<String, User> redisOperations =
                 Mockito.mock(ReactiveRedisOperations.class);
         this.cache = Mockito.mock(ReactiveHashOperations.class);
-        Mockito.doReturn(cache).when(operations).opsForHash();
-        this.queryHandler = new UserQueryHandlerImpl(userRepository, operations);
+        Mockito.doReturn(cache).when(redisOperations).opsForHash();
+        this.elasticOperations = Mockito.mock(ReactiveElasticsearchTemplate.class);
+        this.queryHandler = new UserQueryHandlerImpl(
+                userRepository, redisOperations, elasticOperations
+        );
     }
 
     @Test

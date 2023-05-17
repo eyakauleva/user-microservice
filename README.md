@@ -3,7 +3,7 @@
 [Description](#description)<br/>
 [Semantic versioning](#version)<br/>
 [How to authenticate using Istio and JWT](#istio)<br/>
-[How to sync mongodb & elasticsearch (via mongodb change streams)](#sync_changestreams)
+[How to sync mongodb & elasticsearch (via mongodb change streams)](#sync_changestreams)<br/>
 [Kafka connector to elasticsearch](#sync_kafka)
 
 <a id="description"></a>

@@ -13,8 +13,6 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserCriteria {
 
-    private Integer page;
-    private Integer size;
     private String name;
     private String phone;
     private Integer age;

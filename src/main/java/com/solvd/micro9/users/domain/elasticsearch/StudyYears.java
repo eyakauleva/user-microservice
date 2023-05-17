@@ -10,10 +10,10 @@ import org.springframework.data.elasticsearch.annotations.Field;
 @AllArgsConstructor
 public class StudyYears {
 
-    @Field(name = "gte")
+    //@Field(name = "gte")
     private Integer from;
 
-    @Field(name = "lte")
+    //@Field(name = "lte")
     private Integer to;
 
 }

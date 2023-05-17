@@ -5,6 +5,7 @@ import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.command.CreateUserCommand;
 import com.solvd.micro9.users.domain.command.DeleteUserCommand;
 import com.solvd.micro9.users.domain.criteria.UserCriteria;
+import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
 import com.solvd.micro9.users.domain.es.EsUser;
 import com.solvd.micro9.users.domain.query.EsUserQuery;
 import com.solvd.micro9.users.service.EsUserCommandHandler;
@@ -23,10 +24,18 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -52,10 +61,11 @@ public class UserController {
     }
 
     @GetMapping(value = "/search")
-    public Flux<UserDto> findByCriteria(UserCriteriaDto criteriaDto) {
+    public Flux<ElstcUser> findByCriteria(final UserCriteriaDto criteriaDto, final Pageable pageable) {
         UserCriteria criteria = criteriaMapper.dtoToDomain(criteriaDto);
-        Flux<User> userFlux = queryHandler.findByCriteria(criteria);
-        return userMapper.domainToDto(userFlux);
+        Flux<ElstcUser> userFlux = queryHandler.findByCriteria(criteria, pageable);
+        return userFlux;
+        //return userMapper.domainToDto(userFlux); //TODO
     }
 
     @GetMapping(value = "/{id}")

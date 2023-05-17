@@ -6,9 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+@Document(indexName = "syncmongoelastic")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,7 +40,7 @@ public class ElstcUser {
     @Field(type = FieldType.Keyword, name = "eyes_color")
     private EyesColor eyesColor;
 
-    @Field(type = FieldType.Integer_Range, name = "study_years")
+    //@Field(type = FieldType.Integer_Range, name = "study_years")
     private StudyYears studyYears;
 
 }
