@@ -61,8 +61,10 @@ class UserQueryHandlerTest {
         Mockito.when(cache.entries(RedisConfig.CACHE_KEY))
                 .thenReturn(Flux.just(allUsersEntry));
         Mockito.when(userRepository.findAll()).thenReturn(Flux.empty());
-        queryHandler.getAll(); //sets areAllUsersInCache flag to true
-        Flux<User> userFluxFromCache = queryHandler.getAll();
+        Flux<User> userFluxFromCache = queryHandler.getAll()
+                .collectList()
+                .map(usersFromDb -> queryHandler.getAll())
+                .flatMapMany(usersFromCache -> usersFromCache);
         StepVerifier.create(userFluxFromCache)
                 .expectNext(user)
                 .verifyComplete();
