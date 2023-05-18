@@ -20,7 +20,7 @@ import java.util.Collections;
 @Slf4j
 @SpringBootTest
 @DirtiesContext
-public class UserProducerIT extends TestcontainersTest {
+class UserProducerIT extends TestcontainersTest {
 
     private static final String TOPIC = "syncMongoElastic";
 
@@ -28,7 +28,7 @@ public class UserProducerIT extends TestcontainersTest {
     private UserProducer producer;
 
     @Test
-    public void verifyMessageSentToKafkaTest() {
+    void verifyMessageSentToKafkaTest() {
         User user = new User("9999", "Liza", "Ya", "email@gmail.com", false);
         try (Consumer<String, User> consumer = new KafkaConsumer<>(
                 getConsumerProps(User.class)

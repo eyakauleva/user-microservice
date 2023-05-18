@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Testcontainers
-public abstract class TestcontainersTest {
+abstract class TestcontainersTest {
 
     @Container
     private static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(
@@ -29,7 +29,7 @@ public abstract class TestcontainersTest {
         );
     }
 
-    public Map<String, Object> getConsumerProps(final Class<?> clazz) {
+    Map<String, Object> getConsumerProps(final Class<?> clazz) {
         Map<String, Object> props = new HashMap<>();
         props.put(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
