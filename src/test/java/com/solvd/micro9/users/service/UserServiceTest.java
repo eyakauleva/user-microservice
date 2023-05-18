@@ -58,7 +58,6 @@ class UserServiceTest {
         Mono<Void> result = userService.delete(eventStore);
         StepVerifier.create(result)
                 .verifyComplete();
-
         Mockito.verify(producer, Mockito.times(1)).send(userId, null);
     }
 
