@@ -1,7 +1,7 @@
 package com.solvd.micro9.users.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.es.Es;
 import com.solvd.micro9.users.domain.es.EsStatus;
@@ -28,17 +28,20 @@ import java.util.UUID;
 @Slf4j
 @SpringBootTest
 @DirtiesContext
-public class EsProducerIT extends TestcontainersTest {
+class EsProducerIT extends TestcontainersTest {
 
     private static final String TOPIC = "users";
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private EsProducer producer;
 
     @Test
     @SneakyThrows
-    public void verifyMessageSentToKafkaTest() {
-        User user = TestUtils.getUser();
+    void verifyMessageSentToKafkaTest() {
+        User user = new User("1111", "Liza", "Ya", "email@gmail.com", false);
         String payload = new Gson().toJson(user);
         Es event = EsUser.builder()
                 .type(EsType.USER_CREATED)
@@ -55,7 +58,7 @@ public class EsProducerIT extends TestcontainersTest {
             producer.send(event.getType().toString(), event);
             ConsumerRecords<String, Es> records = consumer.poll(Duration.ofSeconds(5));
             ConsumerRecord<String, Es> record = records.iterator().next();
-            Es result = getObjectMapper().readValue(
+            Es result = objectMapper.readValue(
                     String.valueOf(record.value()), EsUser.class
             );
             Assertions.assertEquals(1, records.count());
