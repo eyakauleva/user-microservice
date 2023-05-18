@@ -3,6 +3,7 @@ package com.solvd.micro9.users;
 import com.solvd.micro9.users.domain.aggregate.EyesColor;
 import com.solvd.micro9.users.domain.aggregate.Gender;
 import com.solvd.micro9.users.domain.aggregate.User;
+import com.solvd.micro9.users.domain.criteria.UserCriteria;
 import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
 import com.solvd.micro9.users.domain.elasticsearch.StudyYears;
 
@@ -21,6 +22,10 @@ public final class TestUtils {
         return new ElstcUser("1111", "Liza Ya", "+12345",
                 20, Gender.FEMALE, 170.5f, 50.2f, EyesColor.BLUE,
                 new StudyYears(2015, 2018));
+    }
+
+    public static UserCriteria getUserCriteria() {
+        return new UserCriteria(); //TODO
     }
 
 }
