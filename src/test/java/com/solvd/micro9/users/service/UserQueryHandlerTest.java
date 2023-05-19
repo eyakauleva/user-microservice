@@ -1,5 +1,6 @@
 package com.solvd.micro9.users.service;
 
+import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.exception.ResourceDoesNotExistException;
 import com.solvd.micro9.users.domain.query.EsUserQuery;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import reactor.core.publisher.Flux;
@@ -24,24 +26,26 @@ import java.util.Map;
 class UserQueryHandlerTest {
 
     private UserRepository userRepository;
-
     private ReactiveHashOperations<String, String, User> cache;
-
     private UserQueryHandlerImpl queryHandler;
 
     @BeforeEach
     void init() {
         this.userRepository = Mockito.mock(UserRepository.class);
-        ReactiveRedisOperations<String, User> operations =
+        ReactiveRedisOperations<String, User> rdsOperations =
                 Mockito.mock(ReactiveRedisOperations.class);
         this.cache = Mockito.mock(ReactiveHashOperations.class);
-        Mockito.doReturn(cache).when(operations).opsForHash();
-        this.queryHandler = new UserQueryHandlerImpl(userRepository, operations);
+        Mockito.doReturn(cache).when(rdsOperations).opsForHash();
+        ReactiveElasticsearchOperations elasticsearch =
+                Mockito.mock(ReactiveElasticsearchOperations.class);
+        this.queryHandler = new UserQueryHandlerImpl(
+                userRepository, rdsOperations, elasticsearch
+        );
     }
 
     @Test
     void verifyAllExistingUsersAreFoundInDbTest() {
-        User user = new User("1111", "Liza", "Ya", "email@gmail.com", false);
+        User user = TestUtils.getUser();
         Flux<User> allUsers = Flux.just(user);
         Mockito.when(userRepository.findAll()).thenReturn(allUsers);
         Mockito.when(cache.put(RedisConfig.CACHE_KEY, user.getId(), user))
@@ -54,7 +58,7 @@ class UserQueryHandlerTest {
 
     @Test
     void verifyAllExistingUsersAreFoundInCacheTest() {
-        User user = new User("1111", "Liza", "Ya", "email@gmail.com", false);
+        User user = TestUtils.getUser();
         Map.Entry<String, User> allUsersEntry = new AbstractMap.SimpleEntry<>(
                 "test", user
         );
@@ -72,10 +76,9 @@ class UserQueryHandlerTest {
 
     @Test
     void verifyUserIsFoundByIdFromDbTest() {
-        String userId = "1111";
-        User user = new User(userId, "Liza", "Ya", "email@gmail.com", false);
-        EsUserQuery query = new EsUserQuery(userId);
-        Mockito.when(userRepository.findById(userId)).thenReturn(Mono.just(user));
+        User user = TestUtils.getUser();
+        EsUserQuery query = new EsUserQuery(user.getId());
+        Mockito.when(userRepository.findById(user.getId())).thenReturn(Mono.just(user));
         Mockito.when(cache.get(RedisConfig.CACHE_KEY, query.getId()))
                 .thenReturn(Mono.empty());
         Mockito.when(cache.put(RedisConfig.CACHE_KEY, user.getId(), user))
@@ -88,9 +91,8 @@ class UserQueryHandlerTest {
 
     @Test
     void verifyUserIsFoundByIdFromCacheTest() {
-        String userId = "1111";
-        User user = new User(userId, "Liza", "Ya", "email@gmail.com", false);
-        EsUserQuery query = new EsUserQuery(userId);
+        User user = TestUtils.getUser();
+        EsUserQuery query = new EsUserQuery(user.getId());
         Mockito.when(cache.get(RedisConfig.CACHE_KEY, query.getId()))
                 .thenReturn(Mono.just(user));
         Mono<User> foundUser = queryHandler.findById(query);

@@ -1,7 +1,8 @@
-package com.solvd.micro9.users.integration;
+package com.solvd.micro9.users.integration.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.es.Es;
 import com.solvd.micro9.users.domain.es.EsStatus;
@@ -28,7 +29,7 @@ import java.util.UUID;
 @Slf4j
 @SpringBootTest
 @DirtiesContext
-class EsProducerIT extends TestcontainersTest {
+class EsProducerIT extends KafkaTestcontainers {
 
     private static final String TOPIC = "users";
 
@@ -41,7 +42,7 @@ class EsProducerIT extends TestcontainersTest {
     @Test
     @SneakyThrows
     void verifyMessageSentToKafkaTest() {
-        User user = new User("1111", "Liza", "Ya", "email@gmail.com", false);
+        User user = TestUtils.getUser();
         String payload = new Gson().toJson(user);
         Es event = EsUser.builder()
                 .type(EsType.USER_CREATED)
