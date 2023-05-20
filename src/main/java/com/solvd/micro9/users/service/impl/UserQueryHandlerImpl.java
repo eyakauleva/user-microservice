@@ -2,19 +2,15 @@ package com.solvd.micro9.users.service.impl;
 
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.criteria.UserCriteria;
-import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
 import com.solvd.micro9.users.domain.exception.ResourceDoesNotExistException;
 import com.solvd.micro9.users.domain.query.EsUserQuery;
+import com.solvd.micro9.users.persistence.elastic.ReactiveElasticFilter;
 import com.solvd.micro9.users.persistence.snapshot.UserRepository;
 import com.solvd.micro9.users.service.UserQueryHandler;
 import com.solvd.micro9.users.service.cache.RedisConfig;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.query.Criteria;
-import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
-import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.stereotype.Service;
@@ -30,15 +26,15 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
 
     private final UserRepository userRepository;
     private final ReactiveHashOperations<String, String, User> cache;
-    private final ReactiveElasticsearchOperations elasticOperations;
+    private final ReactiveElasticFilter elasticFilter;
     private boolean areAllUsersInCache = false;
 
     public UserQueryHandlerImpl(final UserRepository userRepository,
                                 final ReactiveRedisOperations<String, User> rdsOperations,
-                                final ReactiveElasticsearchOperations elasticOperations) {
+                                final ReactiveElasticFilter elasticFilter) {
         this.userRepository = userRepository;
         this.cache = rdsOperations.opsForHash();
-        this.elasticOperations = elasticOperations;
+        this.elasticFilter = elasticFilter;
     }
 
     @Override
@@ -58,11 +54,9 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
     @Override
     public Flux<User> findByCriteria(final UserCriteria criteria,
                                      final Pageable pageable) {
-        Criteria elstcCriteria = prepareCriteria(criteria);
-        Query query = new CriteriaQuery(elstcCriteria).setPageable(pageable);
-        return elasticOperations.search(query, ElstcUser.class)
-                .flatMap(elasticHit -> this.findById(
-                        new EsUserQuery(elasticHit.getContent().getId()))
+        return elasticFilter.doFilter(criteria, pageable)
+                .flatMap(elstcUser -> this.findById(
+                        new EsUserQuery(elstcUser.getId()))
                 );
     }
 
@@ -83,53 +77,6 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
                 )
                 .flatMap(user -> cache.put(RedisConfig.CACHE_KEY, id, user)
                         .thenReturn(user));
-    }
-
-    private Criteria prepareCriteria(final UserCriteria criteriaData) {
-        Criteria searchCriteria = new Criteria();
-        if (criteriaData.getName() != null) {
-            searchCriteria.and(Criteria.where("full_name")
-                    .contains(criteriaData.getName()));
-        }
-        if (criteriaData.getPhone() != null) {
-            searchCriteria.and(Criteria.where("phone")
-                    .is(criteriaData.getPhone()));
-        }
-        if (criteriaData.getAge() != null) {
-            searchCriteria.and(Criteria.where("age")
-                    .is(criteriaData.getAge()));
-        }
-        if (criteriaData.getHeightFrom() != null) {
-            searchCriteria.and(Criteria.where("height")
-                    .greaterThanEqual(criteriaData.getHeightFrom()));
-        }
-        if (criteriaData.getHeightTo() != null) {
-            searchCriteria.and(Criteria.where("height")
-                    .lessThanEqual(criteriaData.getHeightTo()));
-        }
-        if (criteriaData.getWeightFrom() != null) {
-            searchCriteria.and(Criteria.where("weight")
-                    .greaterThanEqual(criteriaData.getWeightFrom()));
-        }
-        if (criteriaData.getWeightTo() != null) {
-            searchCriteria.and(Criteria.where("weight")
-                    .lessThanEqual(criteriaData.getWeightTo()));
-        }
-        if (criteriaData.getGenders() != null
-                && criteriaData.getGenders().size() > 0) {
-            searchCriteria.and(Criteria.where("gender")
-                    .in(criteriaData.getGenders()));
-        }
-        if (criteriaData.getEyesColors() != null
-                && criteriaData.getEyesColors().size() > 0) {
-            searchCriteria.and(Criteria.where("eyes_color")
-                    .in(criteriaData.getEyesColors()));
-        }
-        if (criteriaData.getStudyYear() != null) {
-            searchCriteria.and(Criteria.where("study_years")
-                    .is(criteriaData.getStudyYear()));
-        }
-        return searchCriteria;
     }
 
     @PreDestroy

@@ -4,6 +4,7 @@ import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.exception.ResourceDoesNotExistException;
 import com.solvd.micro9.users.domain.query.EsUserQuery;
+import com.solvd.micro9.users.persistence.elastic.ReactiveElasticFilter;
 import com.solvd.micro9.users.persistence.snapshot.UserRepository;
 import com.solvd.micro9.users.service.cache.RedisConfig;
 import com.solvd.micro9.users.service.impl.UserQueryHandlerImpl;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import reactor.core.publisher.Flux;
@@ -36,10 +36,9 @@ class UserQueryHandlerTest {
                 Mockito.mock(ReactiveRedisOperations.class);
         this.cache = Mockito.mock(ReactiveHashOperations.class);
         Mockito.doReturn(cache).when(rdsOperations).opsForHash();
-        ReactiveElasticsearchOperations elasticsearch =
-                Mockito.mock(ReactiveElasticsearchOperations.class);
+        ReactiveElasticFilter elasticFilter = Mockito.mock(ReactiveElasticFilter.class);
         this.queryHandler = new UserQueryHandlerImpl(
-                userRepository, rdsOperations, elasticsearch
+                userRepository, rdsOperations, elasticFilter
         );
     }
 

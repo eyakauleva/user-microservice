@@ -1,4 +1,4 @@
-package com.solvd.micro9.users.persistence;
+package com.solvd.micro9.users.persistence.elastic;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
