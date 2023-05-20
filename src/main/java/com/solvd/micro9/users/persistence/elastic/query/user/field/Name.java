@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class Name implements UserField {
 
     @Override
-    public void apply(UserCriteria criteriaData, Criteria searchCriteria) {
+    public void apply(final UserCriteria criteriaData, final Criteria searchCriteria) {
         if (criteriaData.getName() != null) {
             searchCriteria.and(Criteria.where("full_name")
                     .contains(criteriaData.getName()));

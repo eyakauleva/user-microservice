@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class Gender implements UserField {
 
     @Override
-    public void apply(UserCriteria criteriaData, Criteria searchCriteria) {
+    public void apply(final UserCriteria criteriaData, final Criteria searchCriteria) {
         if (criteriaData.getGenders() != null
                 && criteriaData.getGenders().size() > 0) {
             searchCriteria.and(Criteria.where("gender")

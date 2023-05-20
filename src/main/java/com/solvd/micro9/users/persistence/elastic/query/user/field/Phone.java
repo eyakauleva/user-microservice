@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class Phone implements UserField {
 
     @Override
-    public void apply(UserCriteria criteriaData, Criteria searchCriteria) {
+    public void apply(final UserCriteria criteriaData, final Criteria searchCriteria) {
         if (criteriaData.getPhone() != null) {
             searchCriteria.and(Criteria.where("phone")
                     .is(criteriaData.getPhone()));

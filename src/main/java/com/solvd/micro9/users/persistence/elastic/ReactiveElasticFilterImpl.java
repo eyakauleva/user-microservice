@@ -19,7 +19,8 @@ public class ReactiveElasticFilterImpl implements ReactiveElasticFilter {
     private final QueryBuilder queryBuilder;
 
     @Override
-    public Flux<ElstcUser> doFilter(UserCriteria criteria, Pageable pageable) {
+    public Flux<ElstcUser> doFilter(final UserCriteria criteria,
+                                    final Pageable pageable) {
         Query query = queryBuilder.build(criteria, pageable);
         return operations.search(query, ElstcUser.class)
                 .map(SearchHit::getContent);

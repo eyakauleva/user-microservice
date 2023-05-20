@@ -2,17 +2,22 @@ package com.solvd.micro9.users.service;
 
 import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
+import com.solvd.micro9.users.domain.criteria.UserCriteria;
+import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
 import com.solvd.micro9.users.domain.exception.ResourceDoesNotExistException;
 import com.solvd.micro9.users.domain.query.EsUserQuery;
 import com.solvd.micro9.users.persistence.elastic.ReactiveElasticFilter;
 import com.solvd.micro9.users.persistence.snapshot.UserRepository;
 import com.solvd.micro9.users.service.cache.RedisConfig;
 import com.solvd.micro9.users.service.impl.UserQueryHandlerImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import reactor.core.publisher.Flux;
@@ -27,6 +32,7 @@ class UserQueryHandlerTest {
 
     private UserRepository userRepository;
     private ReactiveHashOperations<String, String, User> cache;
+    private ReactiveElasticFilter elasticFilter;
     private UserQueryHandlerImpl queryHandler;
 
     @BeforeEach
@@ -36,7 +42,7 @@ class UserQueryHandlerTest {
                 Mockito.mock(ReactiveRedisOperations.class);
         this.cache = Mockito.mock(ReactiveHashOperations.class);
         Mockito.doReturn(cache).when(rdsOperations).opsForHash();
-        ReactiveElasticFilter elasticFilter = Mockito.mock(ReactiveElasticFilter.class);
+        this.elasticFilter = Mockito.mock(ReactiveElasticFilter.class);
         this.queryHandler = new UserQueryHandlerImpl(
                 userRepository, rdsOperations, elasticFilter
         );
@@ -70,6 +76,27 @@ class UserQueryHandlerTest {
                 .flatMapMany(usersFromCache -> usersFromCache);
         StepVerifier.create(userFluxFromCache)
                 .expectNext(user)
+                .verifyComplete();
+    }
+
+    @Test
+    void verifyUsersAreFoundByCriteria() {
+        UserCriteria criteria = TestUtils.getUserCriteria();
+        Pageable pageable = PageRequest.of(0, 10);
+        ElstcUser elstcUser = TestUtils.getElstcUser();
+        Mockito.when(elasticFilter.doFilter(criteria, pageable))
+                .thenReturn(Flux.just(elstcUser));
+        Mockito.when(cache.get(RedisConfig.CACHE_KEY, elstcUser.getId()))
+                .thenReturn(Mono.just(TestUtils.convertToUser(elstcUser)));
+        Flux<User> userFlux = queryHandler.findByCriteria(criteria, pageable);
+        StepVerifier.create(userFlux)
+                .expectNextCount(1)
+                .verifyComplete();
+        StepVerifier.create(userFlux)
+                .thenConsumeWhile(user -> {
+                    Assertions.assertEquals(elstcUser.getId(), user.getId());
+                    return true;
+                })
                 .verifyComplete();
     }
 

@@ -18,7 +18,7 @@ public class QueryBuilderImpl implements QueryBuilder {
     private final List<UserField> userFields;
 
     @Override
-    public Query build(UserCriteria criteriaData, Pageable pageable) {
+    public Query build(final UserCriteria criteriaData, final Pageable pageable) {
         Criteria criteria = new Criteria();
         userFields.forEach(field -> field.apply(criteriaData, criteria));
         return new CriteriaQuery(criteria).setPageable(pageable);

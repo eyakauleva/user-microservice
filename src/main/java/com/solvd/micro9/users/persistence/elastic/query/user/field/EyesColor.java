@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class EyesColor implements UserField {
 
     @Override
-    public void apply(UserCriteria criteriaData, Criteria searchCriteria) {
+    public void apply(final UserCriteria criteriaData, final Criteria searchCriteria) {
         if (criteriaData.getEyesColors() != null
                 && criteriaData.getEyesColors().size() > 0) {
             searchCriteria.and(Criteria.where("eyes_color")

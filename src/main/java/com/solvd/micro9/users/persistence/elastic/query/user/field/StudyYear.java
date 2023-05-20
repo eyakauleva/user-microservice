@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class StudyYear implements UserField {
 
     @Override
-    public void apply(UserCriteria criteriaData, Criteria searchCriteria) {
+    public void apply(final UserCriteria criteriaData, final Criteria searchCriteria) {
         if (criteriaData.getStudyYear() != null) {
             searchCriteria.and(Criteria.where("study_years")
                     .is(criteriaData.getStudyYear()));

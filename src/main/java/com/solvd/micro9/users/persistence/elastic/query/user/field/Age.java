@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class Age implements UserField {
 
     @Override
-    public void apply(UserCriteria criteriaData, Criteria searchCriteria) {
+    public void apply(final UserCriteria criteriaData, final Criteria searchCriteria) {
         if (criteriaData.getAge() != null) {
             searchCriteria.and(Criteria.where("age")
                     .is(criteriaData.getAge()));

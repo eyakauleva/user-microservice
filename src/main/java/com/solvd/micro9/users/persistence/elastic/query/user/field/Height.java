@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class Height implements UserField {
 
     @Override
-    public void apply(UserCriteria criteriaData, Criteria searchCriteria) {
+    public void apply(final UserCriteria criteriaData, final Criteria searchCriteria) {
         if (criteriaData.getHeightFrom() != null) {
             searchCriteria.and(Criteria.where("height")
                     .greaterThanEqual(criteriaData.getHeightFrom()));

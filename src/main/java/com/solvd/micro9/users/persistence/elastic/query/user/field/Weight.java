@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class Weight implements UserField {
 
     @Override
-    public void apply(UserCriteria criteriaData, Criteria searchCriteria) {
+    public void apply(final UserCriteria criteriaData, final Criteria searchCriteria) {
         if (criteriaData.getWeightFrom() != null) {
             searchCriteria.and(Criteria.where("weight")
                     .greaterThanEqual(criteriaData.getWeightFrom()));

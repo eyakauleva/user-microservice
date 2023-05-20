@@ -37,7 +37,8 @@ class UserProducerIT extends KafkaTestcontainers {
         )) {
             consumer.subscribe(Collections.singleton(TOPIC));
             producer.send(user.getId(), user);
-            ConsumerRecords<String, ElstcUser> records = consumer.poll(Duration.ofSeconds(5));
+            ConsumerRecords<String, ElstcUser> records =
+                    consumer.poll(Duration.ofSeconds(5));
             ConsumerRecord<String, ElstcUser> record = records.iterator().next();
             ElstcUser result = new Gson().fromJson(
                     String.valueOf(record.value()), ElstcUser.class
