@@ -7,7 +7,7 @@ spring:
   jackson:
     default-property-inclusion: non_null
   elasticsearch:
-    url: ${ELASTIC_DOMAIN}:9200
+    url: ${ELASTIC_HOST}:9200
     username: ${ELASTIC_USER}
     password: ${ELASTIC_PASSWORD}
   data:
