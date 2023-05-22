@@ -1,13 +1,16 @@
 package com.solvd.micro9.users.service.impl;
 
 import com.solvd.micro9.users.domain.aggregate.User;
+import com.solvd.micro9.users.domain.criteria.UserCriteria;
 import com.solvd.micro9.users.domain.exception.ResourceDoesNotExistException;
 import com.solvd.micro9.users.domain.query.EsUserQuery;
+import com.solvd.micro9.users.persistence.elastic.ElasticFilter;
 import com.solvd.micro9.users.persistence.snapshot.UserRepository;
 import com.solvd.micro9.users.service.UserQueryHandler;
 import com.solvd.micro9.users.service.cache.RedisConfig;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.stereotype.Service;
@@ -23,12 +26,15 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
 
     private final UserRepository userRepository;
     private final ReactiveHashOperations<String, String, User> cache;
+    private final ElasticFilter elasticFilter;
     private boolean areAllUsersInCache = false;
 
     public UserQueryHandlerImpl(final UserRepository userRepository,
-                                final ReactiveRedisOperations<String, User> operations) {
+                                final ReactiveRedisOperations<String, User> rdsOperations,
+                                final ElasticFilter elasticFilter) {
         this.userRepository = userRepository;
-        this.cache = operations.opsForHash();
+        this.cache = rdsOperations.opsForHash();
+        this.elasticFilter = elasticFilter;
     }
 
     @Override
@@ -43,6 +49,15 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
                             .subscribeOn(Schedulers.boundedElastic())
                             .subscribe());
         }
+    }
+
+    @Override
+    public Flux<User> findByCriteria(final UserCriteria criteria,
+                                     final Pageable pageable) {
+        return elasticFilter.doFilter(criteria, pageable)
+                .flatMap(elstcUser -> this.findById(
+                        new EsUserQuery(elstcUser.getId()))
+                );
     }
 
     @Override

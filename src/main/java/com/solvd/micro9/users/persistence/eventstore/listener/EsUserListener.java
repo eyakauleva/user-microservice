@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventLis
 import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 @Component
@@ -20,7 +19,7 @@ public class EsUserListener extends AbstractMongoEventListener<EsUser> {
     @Override
     public void onBeforeConvert(final BeforeConvertEvent<EsUser> event) {
         try {
-            if (Objects.isNull(event.getSource().getId())) {
+            if (event.getSource().getId() == null) {
                 event.getSource().setId(
                         sequenceGenerator.generateSequence(EsUser.SEQUENCE_NAME)
                 );

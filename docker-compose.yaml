@@ -14,7 +14,7 @@ services:
       - MONGODB_USER=${MONGODB_USER}
       - MONGODB_PASSWORD=${MONGODB_PASSWORD}
       - MONGODB_COLLECTION=users
-      - ELASTIC_DOMAIN=elasticsearch
+      - ELASTIC_HOST=elasticsearch
       - ELASTIC_USER=${ELASTIC_USER}
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTIC_INDEX=mongodb_logstash

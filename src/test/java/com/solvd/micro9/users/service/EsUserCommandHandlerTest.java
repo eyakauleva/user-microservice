@@ -1,6 +1,7 @@
 package com.solvd.micro9.users.service;
 
 import com.google.gson.Gson;
+import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.command.CompleteTransactionCommand;
 import com.solvd.micro9.users.domain.command.CreateUserCommand;
@@ -54,7 +55,7 @@ class EsUserCommandHandlerTest {
 
     @Test
     void verifyCreateUserCommandIsAppliedTest() {
-        User user = new User("1111", "Liza", "Ya", "email@gmail.com", false);
+        User user = TestUtils.getUser();
         CreateUserCommand command = new CreateUserCommand(user, "Liza");
         String payload = new Gson().toJson(command.getUser());
         EsUser createdEvent = EsUser.builder()

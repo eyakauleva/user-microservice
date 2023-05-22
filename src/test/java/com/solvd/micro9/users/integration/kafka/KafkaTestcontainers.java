@@ -1,4 +1,4 @@
-package com.solvd.micro9.users.integration;
+package com.solvd.micro9.users.integration.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Testcontainers
-abstract class TestcontainersTest {
+abstract class KafkaTestcontainers {
 
     @Container
     private static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(

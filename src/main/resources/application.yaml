@@ -6,6 +6,10 @@ spring:
     import: optional:file:.env[.properties]
   jackson:
     default-property-inclusion: non_null
+  elasticsearch:
+    url: ${ELASTIC_HOST}:9200
+    username: ${ELASTIC_USER}
+    password: ${ELASTIC_PASSWORD}
   data:
     mongodb:
       uri: mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_DOMAIN}:27017/users?authSource=admin&replicaSet=rs0
