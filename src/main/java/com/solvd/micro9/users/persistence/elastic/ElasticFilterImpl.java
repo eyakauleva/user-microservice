@@ -13,7 +13,7 @@ import reactor.core.publisher.Flux;
 
 @Component
 @RequiredArgsConstructor
-public class ReactiveElasticFilterImpl implements ReactiveElasticFilter {
+public class ElasticFilterImpl implements ElasticFilter {
 
     private final ReactiveElasticsearchOperations operations;
     private final QueryBuilder queryBuilder;

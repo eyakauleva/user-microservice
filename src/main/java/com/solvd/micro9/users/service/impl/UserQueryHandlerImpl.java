@@ -4,7 +4,7 @@ import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.criteria.UserCriteria;
 import com.solvd.micro9.users.domain.exception.ResourceDoesNotExistException;
 import com.solvd.micro9.users.domain.query.EsUserQuery;
-import com.solvd.micro9.users.persistence.elastic.ReactiveElasticFilter;
+import com.solvd.micro9.users.persistence.elastic.ElasticFilter;
 import com.solvd.micro9.users.persistence.snapshot.UserRepository;
 import com.solvd.micro9.users.service.UserQueryHandler;
 import com.solvd.micro9.users.service.cache.RedisConfig;
@@ -26,12 +26,12 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
 
     private final UserRepository userRepository;
     private final ReactiveHashOperations<String, String, User> cache;
-    private final ReactiveElasticFilter elasticFilter;
+    private final ElasticFilter elasticFilter;
     private boolean areAllUsersInCache = false;
 
     public UserQueryHandlerImpl(final UserRepository userRepository,
                                 final ReactiveRedisOperations<String, User> rdsOperations,
-                                final ReactiveElasticFilter elasticFilter) {
+                                final ElasticFilter elasticFilter) {
         this.userRepository = userRepository;
         this.cache = rdsOperations.opsForHash();
         this.elasticFilter = elasticFilter;

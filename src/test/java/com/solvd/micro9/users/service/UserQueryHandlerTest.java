@@ -6,7 +6,7 @@ import com.solvd.micro9.users.domain.criteria.UserCriteria;
 import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
 import com.solvd.micro9.users.domain.exception.ResourceDoesNotExistException;
 import com.solvd.micro9.users.domain.query.EsUserQuery;
-import com.solvd.micro9.users.persistence.elastic.ReactiveElasticFilter;
+import com.solvd.micro9.users.persistence.elastic.ElasticFilter;
 import com.solvd.micro9.users.persistence.snapshot.UserRepository;
 import com.solvd.micro9.users.service.cache.RedisConfig;
 import com.solvd.micro9.users.service.impl.UserQueryHandlerImpl;
@@ -32,7 +32,7 @@ class UserQueryHandlerTest {
 
     private UserRepository userRepository;
     private ReactiveHashOperations<String, String, User> cache;
-    private ReactiveElasticFilter elasticFilter;
+    private ElasticFilter elasticFilter;
     private UserQueryHandlerImpl queryHandler;
 
     @BeforeEach
@@ -42,7 +42,7 @@ class UserQueryHandlerTest {
                 Mockito.mock(ReactiveRedisOperations.class);
         this.cache = Mockito.mock(ReactiveHashOperations.class);
         Mockito.doReturn(cache).when(rdsOperations).opsForHash();
-        this.elasticFilter = Mockito.mock(ReactiveElasticFilter.class);
+        this.elasticFilter = Mockito.mock(ElasticFilter.class);
         this.queryHandler = new UserQueryHandlerImpl(
                 userRepository, rdsOperations, elasticFilter
         );
