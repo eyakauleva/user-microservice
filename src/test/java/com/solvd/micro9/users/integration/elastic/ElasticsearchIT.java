@@ -25,7 +25,7 @@ import reactor.test.StepVerifier;
 import java.util.List;
 
 @Slf4j
-@SpringBootTest(classes = {ElasticITContext.class, UserQueryHandlerImpl.class})
+@SpringBootTest(classes = {ElasticsearchITConfig.class, UserQueryHandlerImpl.class})
 @DirtiesContext
 class ElasticsearchIT extends ElasticTestcontainers {
 
