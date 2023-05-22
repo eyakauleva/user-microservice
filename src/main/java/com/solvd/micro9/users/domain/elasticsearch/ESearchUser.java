@@ -14,7 +14,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ElstcUser {
+public class ESearchUser {
 
     @Id
     private String id;

@@ -3,7 +3,7 @@ package com.solvd.micro9.users.integration.kafka;
 import com.google.gson.Gson;
 import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
-import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
+import com.solvd.micro9.users.domain.elasticsearch.ESearchUser;
 import com.solvd.micro9.users.messaging.UserProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -31,17 +31,17 @@ class UserProducerIT extends KafkaTestcontainers {
 
     @Test
     void verifyMessageSentToKafkaTest() {
-        ElstcUser user = TestUtils.getElstcUser();
-        try (Consumer<String, ElstcUser> consumer = new KafkaConsumer<>(
+        ESearchUser user = TestUtils.getElstcUser();
+        try (Consumer<String, ESearchUser> consumer = new KafkaConsumer<>(
                 getConsumerProps(User.class)
         )) {
             consumer.subscribe(Collections.singleton(TOPIC));
             producer.send(user.getId(), user);
-            ConsumerRecords<String, ElstcUser> records =
+            ConsumerRecords<String, ESearchUser> records =
                     consumer.poll(Duration.ofSeconds(5));
-            ConsumerRecord<String, ElstcUser> record = records.iterator().next();
-            ElstcUser result = new Gson().fromJson(
-                    String.valueOf(record.value()), ElstcUser.class
+            ConsumerRecord<String, ESearchUser> record = records.iterator().next();
+            ESearchUser result = new Gson().fromJson(
+                    String.valueOf(record.value()), ESearchUser.class
             );
             Assertions.assertEquals(1, records.count());
             Assertions.assertEquals(user, result);

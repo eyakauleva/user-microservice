@@ -2,7 +2,7 @@ package com.solvd.micro9.users.service.impl;
 
 import com.google.gson.Gson;
 import com.solvd.micro9.users.domain.aggregate.User;
-import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
+import com.solvd.micro9.users.domain.elasticsearch.ESearchUser;
 import com.solvd.micro9.users.domain.elasticsearch.StudyYears;
 import com.solvd.micro9.users.domain.es.Es;
 import com.solvd.micro9.users.messaging.KfProducer;
@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final KfProducer<String, ElstcUser> producer;
+    private final KfProducer<String, ESearchUser> producer;
 
     @Override
     public Mono<User> create(final Es eventStore) {
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
         user.setNew(true);
         return userRepository.save(user)
                 .doOnNext(savedUser -> {
-                    ElstcUser elstcUser = new ElstcUser(
+                    ESearchUser elstcUser = new ESearchUser(
                             savedUser.getId(),
                             savedUser.getFirstName() + " " + savedUser.getLastName(),
                             savedUser.getPhone(),

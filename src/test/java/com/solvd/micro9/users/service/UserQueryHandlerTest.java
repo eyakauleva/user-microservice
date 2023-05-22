@@ -3,7 +3,7 @@ package com.solvd.micro9.users.service;
 import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.criteria.UserCriteria;
-import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
+import com.solvd.micro9.users.domain.elasticsearch.ESearchUser;
 import com.solvd.micro9.users.domain.exception.ResourceDoesNotExistException;
 import com.solvd.micro9.users.domain.query.EsUserQuery;
 import com.solvd.micro9.users.persistence.elastic.ElasticFilter;
@@ -83,7 +83,7 @@ class UserQueryHandlerTest {
     void verifyUsersAreFoundByCriteria() {
         UserCriteria criteria = TestUtils.getUserCriteria();
         Pageable pageable = PageRequest.of(0, 10);
-        ElstcUser elstcUser = TestUtils.getElstcUser();
+        ESearchUser elstcUser = TestUtils.getElstcUser();
         Mockito.when(elasticFilter.doFilter(criteria, pageable))
                 .thenReturn(Flux.just(elstcUser));
         Mockito.when(cache.get(RedisConfig.CACHE_KEY, elstcUser.getId()))

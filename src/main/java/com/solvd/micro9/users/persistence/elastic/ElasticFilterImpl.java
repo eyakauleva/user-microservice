@@ -1,7 +1,7 @@
 package com.solvd.micro9.users.persistence.elastic;
 
 import com.solvd.micro9.users.domain.criteria.UserCriteria;
-import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
+import com.solvd.micro9.users.domain.elasticsearch.ESearchUser;
 import com.solvd.micro9.users.persistence.elastic.query.QueryBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -19,10 +19,10 @@ public class ElasticFilterImpl implements ElasticFilter {
     private final QueryBuilder queryBuilder;
 
     @Override
-    public Flux<ElstcUser> doFilter(final UserCriteria criteria,
-                                    final Pageable pageable) {
+    public Flux<ESearchUser> doFilter(final UserCriteria criteria,
+                                      final Pageable pageable) {
         Query query = queryBuilder.build(criteria, pageable);
-        return operations.search(query, ElstcUser.class)
+        return operations.search(query, ESearchUser.class)
                 .map(SearchHit::getContent);
     }
 

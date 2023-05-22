@@ -3,7 +3,7 @@ package com.solvd.micro9.users.service;
 import com.google.gson.Gson;
 import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
-import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
+import com.solvd.micro9.users.domain.elasticsearch.ESearchUser;
 import com.solvd.micro9.users.domain.es.Es;
 import com.solvd.micro9.users.domain.es.EsStatus;
 import com.solvd.micro9.users.domain.es.EsType;
@@ -28,7 +28,7 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private KfProducer<String, ElstcUser> producer;
+    private KfProducer<String, ESearchUser> producer;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -49,7 +49,7 @@ class UserServiceTest {
                 .verifyComplete();
         Mockito.verify(producer, Mockito.times(1)).send(
                 Mockito.anyString(),
-                Mockito.any(ElstcUser.class)
+                Mockito.any(ESearchUser.class)
         );
     }
 

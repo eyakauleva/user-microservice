@@ -3,7 +3,7 @@ package com.solvd.micro9.users.integration.elastic;
 import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.criteria.UserCriteria;
-import com.solvd.micro9.users.domain.elasticsearch.ElstcUser;
+import com.solvd.micro9.users.domain.elasticsearch.ESearchUser;
 import com.solvd.micro9.users.persistence.snapshot.UserRepository;
 import com.solvd.micro9.users.service.UserQueryHandler;
 import com.solvd.micro9.users.service.impl.UserQueryHandlerImpl;
@@ -43,7 +43,7 @@ class ElasticsearchIT extends ElasticTestcontainers {
     void verifyElasticsearchUsersAreFoundByCriteria() {
         UserCriteria criteria = TestUtils.getUserCriteria();
         Pageable pageable = PageRequest.of(0, 10);
-        List<ElstcUser> elstcUsers = TestUtils.getElstcUsers();
+        List<ESearchUser> elstcUsers = TestUtils.getElstcUsers();
         elstcUsers.forEach(elstcUser ->
                 Mockito.when(userRepository.findById(elstcUser.getId()))
                 .thenReturn(Mono.just(TestUtils.convertToUser(elstcUser))));
