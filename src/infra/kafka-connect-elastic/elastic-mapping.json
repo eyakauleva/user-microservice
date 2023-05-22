@@ -24,6 +24,10 @@
       },
       "study_years": {
         "type" : "integer_range"
+      },
+      "timestamp": {
+        "type": "date",
+        "format": "strict_date_hour_minute_second"
       }
     }
   }
