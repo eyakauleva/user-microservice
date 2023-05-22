@@ -8,7 +8,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
-public abstract class ElasticTestcontainers { //TODO remove PUBLIC
+abstract class ElasticTestcontainers {
 
     private static final String TEST_PASSWORD = "testPassword";
 
@@ -16,14 +16,14 @@ public abstract class ElasticTestcontainers { //TODO remove PUBLIC
     private static final ElasticsearchContainer ELASTICSEARCH_CONTAINER =
             new ElasticsearchContainer(
                     DockerImageName
-                        .parse("elasticsearch:8.7.0")
-                        .asCompatibleSubstituteFor(
-                                "docker.elastic.co/elasticsearch/elasticsearch"
-                        )
+                            .parse("elasticsearch:8.7.0")
+                            .asCompatibleSubstituteFor(
+                                    "docker.elastic.co/elasticsearch/elasticsearch"
+                            )
             )
-            .withPassword(TEST_PASSWORD)
-            .withEnv("discovery.type", "single-node")
-            .withEnv("xpack.security.enabled", "true");
+                    .withPassword(TEST_PASSWORD)
+                    .withEnv("discovery.type", "single-node")
+                    .withEnv("xpack.security.enabled", "true");
 
     @DynamicPropertySource
     static void kafkaProperties(final DynamicPropertyRegistry registry) {
