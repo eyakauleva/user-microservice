@@ -7,6 +7,7 @@ import com.solvd.micro9.users.domain.criteria.UserCriteria;
 import com.solvd.micro9.users.domain.elasticsearch.ESearchUser;
 import com.solvd.micro9.users.domain.elasticsearch.StudyYears;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -24,19 +25,19 @@ public final class TestUtils {
     public static ESearchUser getElstcUser() {
         return new ESearchUser("1111", "Liza Ya", "+12345",
                 20, Gender.FEMALE, 170.5f, 50.2f, EyesColor.BLUE,
-                new StudyYears(2015, 2018));
+                new StudyYears(2015, 2018), LocalDateTime.now());
     }
 
     public static List<ESearchUser> getElstcUsers() {
         ESearchUser user1 = new ESearchUser("111", "Liza Ya", "+12345",
                 20, Gender.FEMALE, 170.5f, 57.2f, EyesColor.BLUE,
-                new StudyYears(2019, 2024));
+                new StudyYears(2019, 2024), LocalDateTime.now());
         ESearchUser user2 = new ESearchUser("234", "Ivan Ivanov", "+8928912",
                 36, Gender.MALE, 192.4f, 96.2f, EyesColor.GREEN,
-                new StudyYears(2010, 2014));
+                new StudyYears(2010, 2014), LocalDateTime.now());
         ESearchUser user3 = new ESearchUser("43436", "Petr Petrov", "+35232",
                 27, Gender.UNSET, 179.0f, 85.1f, EyesColor.UNSET,
-                new StudyYears(2012, 2016));
+                new StudyYears(2012, 2016), LocalDateTime.now());
         return List.of(user1, user2, user3);
     }
 
