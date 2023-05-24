@@ -40,9 +40,11 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
     @Override
     public Flux<User> getAll() {
         if (areAllUsersInCache) {
+            log.info("All users were retrieved from cache");
             return cache.entries(RedisConfig.CACHE_KEY)
                     .map(Map.Entry::getValue);
         } else {
+            log.info("All users were retrieved from db");
             areAllUsersInCache = true;
             return userRepository.findAll()
                     .doOnNext(user -> cache.put(RedisConfig.CACHE_KEY, user.getId(), user)
