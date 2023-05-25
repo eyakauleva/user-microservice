@@ -1,6 +1,12 @@
 
 ticket-service: ${TICKET_SERVICE_DOMAIN}:9090
 
+logging:
+  level:
+    root: INFO
+  file:
+    name: logs/application-info.log
+
 spring:
   config:
     import: optional:file:.env[.properties]
@@ -58,10 +64,14 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health,prometheus
   endpoint:
     health:
       show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
 
 resilience4j:
   circuitbreaker:
