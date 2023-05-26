@@ -46,7 +46,7 @@ public class ESearchUser {
     @Field(type = FieldType.Integer_Range, name = "study_years")
     private StudyYears studyYears;
 
-    @Field(type = FieldType.Date)
+    @Field(type = FieldType.Date, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime timestamp = LocalDateTime.now();
 
