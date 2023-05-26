@@ -18,6 +18,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -57,9 +59,12 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
     public Flux<User> findByCriteria(final UserCriteria criteria,
                                      final Pageable pageable) {
         return elasticFilter.doFilter(criteria, pageable)
-                .flatMap(elstcUser -> this.findById(
-                        new EsUserQuery(elstcUser.getId()))
-                );
+                .collectList()
+                .flatMapMany(elstcUsers -> {
+                    List<String> ids = new ArrayList<>();
+                    elstcUsers.forEach(eSearchUser -> ids.add(eSearchUser.getId()));
+                    return userRepository.findAllById(ids);
+                });
     }
 
     @Override

@@ -72,8 +72,7 @@ class UserQueryHandlerTest {
         Mockito.when(userRepository.findAll()).thenReturn(Flux.empty());
         Flux<User> userFluxFromCache = queryHandler.getAll()
                 .collectList()
-                .map(usersFromDb -> queryHandler.getAll())
-                .flatMapMany(usersFromCache -> usersFromCache);
+                .flatMapMany(usersFromDb -> queryHandler.getAll());
         StepVerifier.create(userFluxFromCache)
                 .expectNext(user)
                 .verifyComplete();
