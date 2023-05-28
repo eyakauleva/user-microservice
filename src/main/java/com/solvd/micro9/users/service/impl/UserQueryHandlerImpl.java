@@ -60,9 +60,9 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
                                      final Pageable pageable) {
         return elasticFilter.doFilter(criteria, pageable)
                 .collectList()
-                .flatMapMany(elstcUsers -> {
+                .flatMapMany(eSearchUsers -> {
                     List<String> ids = new ArrayList<>();
-                    elstcUsers.forEach(eSearchUser -> ids.add(eSearchUser.getId()));
+                    eSearchUsers.forEach(eSearchUser -> ids.add(eSearchUser.getId()));
                     return userRepository.findAllById(ids);
                 });
     }

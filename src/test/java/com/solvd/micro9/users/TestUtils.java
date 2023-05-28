@@ -8,8 +8,11 @@ import com.solvd.micro9.users.domain.elasticsearch.ESearchUser;
 import com.solvd.micro9.users.domain.elasticsearch.StudyYears;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiPredicate;
 
 public final class TestUtils {
 
@@ -54,6 +57,38 @@ public final class TestUtils {
                 170f, 190f, 55f, 70f,
                 Set.of(Gender.MALE, Gender.FEMALE),
                 Set.of(EyesColor.BLUE, EyesColor.UNSET), 2020);
+    }
+
+    public static boolean doesESearchUserSatisfyCriteria(
+            final ESearchUser eSearchUser, final UserCriteria userCriteria
+    ) {
+        List<BiPredicate<ESearchUser, UserCriteria>> predicates = new ArrayList<>();
+        predicates.add((user, criteria) -> Objects.isNull(criteria.getName())
+                || user.getFullName().contains(criteria.getName()));
+        predicates.add((user, criteria) -> Objects.isNull(criteria.getPhone())
+                || user.getPhone().equals(criteria.getPhone()));
+        predicates.add((user, criteria) -> Objects.isNull(criteria.getAge())
+                || criteria.getAge().equals(user.getAge()));
+        predicates.add((user, criteria) -> Objects.isNull(criteria.getHeightFrom())
+                || user.getHeight() >= criteria.getHeightFrom());
+        predicates.add((user, criteria) -> Objects.isNull(criteria.getHeightTo())
+                || user.getHeight() <= criteria.getHeightTo());
+        predicates.add((user, criteria) -> Objects.isNull(criteria.getWeightFrom())
+                || user.getWeight() >= criteria.getWeightFrom());
+        predicates.add((user, criteria) -> Objects.isNull(criteria.getWeightTo())
+                || user.getWeight() <= criteria.getWeightTo());
+        predicates.add((user, criteria) -> Objects.isNull(criteria.getGenders())
+                || criteria.getGenders().contains(user.getGender()));
+        predicates.add((user, criteria) -> Objects.isNull(criteria.getEyesColors())
+                || criteria.getEyesColors().contains(user.getEyesColor()));
+        predicates.add((user, criteria) -> Objects.isNull(criteria.getStudyYear())
+                || (user.getStudyYears().getGte() <= criteria.getStudyYear()
+                    && user.getStudyYears().getLte() >= criteria.getStudyYear()));
+
+        BiPredicate<ESearchUser, UserCriteria> predicate
+                = predicates.stream().reduce(BiPredicate::and).get();
+
+        return predicate.test(eSearchUser, userCriteria);
     }
 
 }

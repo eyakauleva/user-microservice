@@ -25,6 +25,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.AbstractMap;
+import java.util.List;
 import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
@@ -85,8 +86,8 @@ class UserQueryHandlerTest {
         ESearchUser elstcUser = TestUtils.getElstcUser();
         Mockito.when(elasticFilter.doFilter(criteria, pageable))
                 .thenReturn(Flux.just(elstcUser));
-        Mockito.when(cache.get(RedisConfig.CACHE_KEY, elstcUser.getId()))
-                .thenReturn(Mono.just(TestUtils.convertToUser(elstcUser)));
+        Mockito.when(userRepository.findAllById(List.of(elstcUser.getId())))
+                .thenReturn(Flux.just(TestUtils.convertToUser(elstcUser)));
         Flux<User> userFlux = queryHandler.findByCriteria(criteria, pageable);
         StepVerifier.create(userFlux)
                 .expectNextCount(1)
