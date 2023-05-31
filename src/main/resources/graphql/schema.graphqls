@@ -1,15 +1,16 @@
 scalar LocalDateTime
 
-directive @Size(min : Int = 0, max : Int = 2147483647, message : String = "graphql.validation.Size.message")
-                        on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @NotBlank(message : String = "graphql.validation.NotBlank.message")
+    on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 type Query {
  getAllUsers: [User]
- findUserById(userId: ID): User
+ findUserById(userId: ID!): User
 }
 
 type Mutation {
  createUser(userDto: UserInput!): Es
+ deleteUser(id: ID!): Es
 }
 
 type User {
@@ -42,10 +43,10 @@ enum EyesColor {
 }
 
 input UserInput {
-  firstName: String! @Size(min : 1)
-  lastName: String!
-  email: String!
-  phone: String!
+  firstName: String @NotBlank
+  lastName: String @NotBlank
+  email: String @NotBlank
+  phone: String @NotBlank
   age: Int
   gender: Gender
   height: Float

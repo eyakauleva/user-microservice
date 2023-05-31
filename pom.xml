@@ -31,9 +31,15 @@
         <testcontainers.version>1.18.0</testcontainers.version>
         <elasticsearch.version>5.1.0</elasticsearch.version>
         <prometheus.version>1.11.0</prometheus.version>
+        <graphql.validation.version>20.0</graphql.validation.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java-extended-validation</artifactId>
+            <version>${graphql.validation.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-graphql</artifactId>

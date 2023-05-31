@@ -8,6 +8,9 @@ import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.CoercingParseLiteralException;
+import graphql.validation.rules.OnValidationErrorStrategy;
+import graphql.validation.rules.ValidationRules;
+import graphql.validation.schemawiring.ValidationSchemaWiring;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,7 +54,6 @@ public class WebConfig implements WebFluxConfigurer {
         return WebClient.builder();
     }
 
-    @Bean
     public GraphQLScalarType localDateTimeScalar() {
         return GraphQLScalarType.newScalar()
                 .name("LocalDateTime")
@@ -103,10 +105,18 @@ public class WebConfig implements WebFluxConfigurer {
                 }).build();
     }
 
+    public ValidationSchemaWiring schemaWiring() {
+        ValidationRules validationRules = ValidationRules.newValidationRules()
+                .onValidationErrorStrategy(OnValidationErrorStrategy.RETURN_NULL)
+                .build();
+        return new ValidationSchemaWiring(validationRules);
+    }
+
     @Bean
     public RuntimeWiringConfigurer runtimeWiringConfigurer() {
         return wiringBuilder -> wiringBuilder
-                .scalar(localDateTimeScalar());
+                .scalar(localDateTimeScalar())
+                .directiveWiring(schemaWiring());
     }
 
 }
