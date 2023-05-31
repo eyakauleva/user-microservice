@@ -1,0 +1,66 @@
+scalar LocalDateTime
+
+directive @Size(min : Int = 0, max : Int = 2147483647, message : String = "graphql.validation.Size.message")
+                        on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+type Query {
+ getAllUsers: [User]
+ findUserById(userId: ID): User
+}
+
+type Mutation {
+ createUser(userDto: UserInput!): Es
+}
+
+type User {
+ id: ID
+ firstName: String!
+ lastName: String!
+ email: String!
+ phone: String!
+ age: Int
+ gender: Gender
+ height: Float
+ weight: Float
+ eyesColor: EyesColor
+ startStudyYear: Int
+ endStudyYear: Int
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  UNSET
+}
+
+enum EyesColor {
+  BLUE
+  GREEN
+  BROWN
+  GREY
+  UNSET
+}
+
+input UserInput {
+  firstName: String! @Size(min : 1)
+  lastName: String!
+  email: String!
+  phone: String!
+  age: Int
+  gender: Gender
+  height: Float
+  weight: Float
+  eyesColor: EyesColor
+  startStudyYear: Int
+  endStudyYear: Int
+}
+
+type Es {
+ id: ID
+ type: String
+ time: LocalDateTime
+ createdBy: String
+ entityId: String
+ payload: String
+ status: String
+}

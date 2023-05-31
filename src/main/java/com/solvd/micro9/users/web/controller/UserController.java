@@ -24,6 +24,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -31,10 +34,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -54,6 +57,7 @@ public class UserController {
     private static final String USER_SERVICE = "user-service";
 
     @GetMapping
+    @QueryMapping("getAllUsers")
     public Flux<UserDto> getAll() {
         Flux<User> users = queryHandler.getAll();
         return userMapper.domainToDto(users);
@@ -68,7 +72,10 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
-    public Mono<UserDto> findByUserId(@PathVariable(name = "id") final String userId) {
+    @QueryMapping("findUserById")
+    public Mono<UserDto> findByUserId(
+            @PathVariable(name = "id") @Argument final String userId
+    ) {
         EsUserQuery query = new EsUserQuery(userId);
         Mono<User> user = queryHandler.findById(query);
         return userMapper.domainToDto(user);
@@ -117,7 +124,8 @@ public class UserController {
     }
 
     @PostMapping
-    public Mono<EsUser> create(@RequestBody @Validated final UserDto userDto) {
+    @MutationMapping("createUser")
+    public Mono<EsUser> create(@RequestBody @Validated @Argument final UserDto userDto) {
         User user = userMapper.dtoToDomain(userDto);
         CreateUserCommand command = new CreateUserCommand(user, "Liza123");
         return commandHandler.apply(command);
