@@ -2,17 +2,17 @@ scalar LocalDateTime
 
 directive @NotBlank(message : String = "graphql.validation.NotBlank.message")
                     on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-directive @Min(value : Int = 1, message : String = "graphql.validation.Min.message")
+directive @Min(value : Int = 0, message : String = "graphql.validation.Min.message")
                     on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 type Query {
  getAllUsers: [User]
  findUserById(userId: ID!): User
- findByCriteria(criteriaDto: CriteriaInput!, size: Int! @Min, page: Int!): [User]
+ findByCriteria(criteria: CriteriaInput!, size: Int! @Min(value: 1), page: Int! @Min): [User]
 }
 
 type Mutation {
- createUser(userDto: UserInput!): Es
+ createUser(user: UserInput!): Es
  deleteUser(id: ID!): Es
 }
 

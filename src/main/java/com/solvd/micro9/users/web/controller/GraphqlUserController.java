@@ -8,8 +8,6 @@ import com.solvd.micro9.users.domain.es.EsUser;
 import com.solvd.micro9.users.domain.query.EsUserQuery;
 import com.solvd.micro9.users.service.EsUserCommandHandler;
 import com.solvd.micro9.users.service.UserQueryHandler;
-import com.solvd.micro9.users.web.dto.UserDto;
-import com.solvd.micro9.users.web.dto.criteria.UserCriteriaDto;
 import com.solvd.micro9.users.web.mapper.UserCriteriaMapper;
 import com.solvd.micro9.users.web.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -32,31 +30,26 @@ public class GraphqlUserController {
     private final UserCriteriaMapper criteriaMapper;
 
     @QueryMapping("getAllUsers")
-    public Flux<UserDto> getAll() {
-        Flux<User> users = queryHandler.getAll();
-        return userMapper.domainToDto(users);
+    public Flux<User> getAll() {
+        return queryHandler.getAll();
     }
 
     @QueryMapping("findByCriteria")
-    public Flux<UserDto> findByCriteria(@Argument final UserCriteriaDto criteriaDto,
+    public Flux<User> findByCriteria(@Argument final UserCriteria criteria,
                                         @Argument final int size,
                                         @Argument final int page) {
-        UserCriteria criteria = criteriaMapper.dtoToDomain(criteriaDto);
         Pageable pageable = PageRequest.of(page, size);
-        Flux<User> userFlux = queryHandler.findByCriteria(criteria, pageable);
-        return userMapper.domainToDto(userFlux);
+        return queryHandler.findByCriteria(criteria, pageable);
     }
 
     @QueryMapping("findUserById")
-    public Mono<UserDto> findByUserId(@Argument final String userId) {
+    public Mono<User> findByUserId(@Argument final String userId) {
         EsUserQuery query = new EsUserQuery(userId);
-        Mono<User> user = queryHandler.findById(query);
-        return userMapper.domainToDto(user);
+        return queryHandler.findById(query);
     }
 
     @MutationMapping("createUser")
-    public Mono<EsUser> create(@Argument final UserDto userDto) {
-        User user = userMapper.dtoToDomain(userDto);
+    public Mono<EsUser> create(@Argument final User user) {
         CreateUserCommand command = new CreateUserCommand(user, "Liza123");
         return commandHandler.apply(command);
     }
