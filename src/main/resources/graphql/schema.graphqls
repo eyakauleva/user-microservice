@@ -1,11 +1,14 @@
 scalar LocalDateTime
 
 directive @NotBlank(message : String = "graphql.validation.NotBlank.message")
-    on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+                    on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @Min(value : Int = 1, message : String = "graphql.validation.Min.message")
+                    on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 type Query {
  getAllUsers: [User]
  findUserById(userId: ID!): User
+ findByCriteria(criteriaDto: CriteriaInput!, size: Int! @Min, page: Int!): [User]
 }
 
 type Mutation {
@@ -29,31 +32,44 @@ type User {
 }
 
 enum Gender {
-  MALE
-  FEMALE
-  UNSET
+ MALE
+ FEMALE
+ UNSET
 }
 
 enum EyesColor {
-  BLUE
-  GREEN
-  BROWN
-  GREY
-  UNSET
+ BLUE
+ GREEN
+ BROWN
+ GREY
+ UNSET
 }
 
 input UserInput {
-  firstName: String @NotBlank
-  lastName: String @NotBlank
-  email: String @NotBlank
-  phone: String @NotBlank
-  age: Int
-  gender: Gender
-  height: Float
-  weight: Float
-  eyesColor: EyesColor
-  startStudyYear: Int
-  endStudyYear: Int
+ firstName: String @NotBlank
+ lastName: String @NotBlank
+ email: String @NotBlank
+ phone: String @NotBlank
+ age: Int
+ gender: Gender
+ height: Float
+ weight: Float
+ eyesColor: EyesColor
+ startStudyYear: Int
+ endStudyYear: Int
+}
+
+input CriteriaInput {
+ name: String
+ phone: String
+ age: Int
+ heightFrom: Float
+ heightTo: Float
+ weightFrom: Float
+ weightTo: Float
+ genders: [Gender]
+ eyesColors: [EyesColor]
+ studyYear: Int
 }
 
 type Es {

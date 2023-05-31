@@ -24,9 +24,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -45,7 +42,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
-public class UserController {
+public class RestUserController {
 
     @Value("${ticket-service}")
     private String ticketService;
@@ -57,7 +54,6 @@ public class UserController {
     private static final String USER_SERVICE = "user-service";
 
     @GetMapping
-    @QueryMapping("getAllUsers")
     public Flux<UserDto> getAll() {
         Flux<User> users = queryHandler.getAll();
         return userMapper.domainToDto(users);
@@ -72,10 +68,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
-    @QueryMapping("findUserById")
-    public Mono<UserDto> findByUserId(
-            @PathVariable(name = "id") @Argument final String userId
-    ) {
+    public Mono<UserDto> findByUserId(@PathVariable(name = "id") final String userId) {
         EsUserQuery query = new EsUserQuery(userId);
         Mono<User> user = queryHandler.findById(query);
         return userMapper.domainToDto(user);
@@ -124,8 +117,7 @@ public class UserController {
     }
 
     @PostMapping
-    @MutationMapping("createUser")
-    public Mono<EsUser> create(@RequestBody @Validated @Argument final UserDto userDto) {
+    public Mono<EsUser> create(@RequestBody @Validated final UserDto userDto) {
         User user = userMapper.dtoToDomain(userDto);
         CreateUserCommand command = new CreateUserCommand(user, "Liza123");
         return commandHandler.apply(command);
