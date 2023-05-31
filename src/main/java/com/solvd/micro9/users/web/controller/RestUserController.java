@@ -17,6 +17,7 @@ import com.solvd.micro9.users.web.dto.EventDto;
 import com.solvd.micro9.users.web.dto.TicketDto;
 import com.solvd.micro9.users.web.dto.UserDto;
 import com.solvd.micro9.users.web.dto.criteria.UserCriteriaDto;
+import com.solvd.micro9.users.web.mapper.EsMapper;
 import com.solvd.micro9.users.web.mapper.UserCriteriaMapper;
 import com.solvd.micro9.users.web.mapper.UserMapper;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -49,6 +50,7 @@ public class RestUserController {
     private final EsUserCommandHandler commandHandler;
     private final UserQueryHandler queryHandler;
     private final UserMapper userMapper;
+    private final EsMapper esMapper;
     private final WebClient.Builder webClientBuilder;
     private final UserCriteriaMapper criteriaMapper;
     private static final String USER_SERVICE = "user-service";
@@ -117,16 +119,18 @@ public class RestUserController {
     }
 
     @PostMapping
-    public Mono<EsUser> create(@RequestBody @Validated final UserDto userDto) {
+    public Mono<EsDto> create(@RequestBody @Validated final UserDto userDto) {
         User user = userMapper.dtoToDomain(userDto);
         CreateUserCommand command = new CreateUserCommand(user, "Liza123");
-        return commandHandler.apply(command);
+        Mono<EsUser> esUserMono = commandHandler.apply(command);
+        return esMapper.domainToDto(esUserMono);
     }
 
     @DeleteMapping(value = "/{id}")
-    public Mono<EsUser> delete(@PathVariable("id") final String id) {
+    public Mono<EsDto> delete(@PathVariable("id") final String id) {
         DeleteUserCommand command = new DeleteUserCommand(id, "Liza123");
-        return commandHandler.apply(command);
+        Mono<EsUser> esUserMono = commandHandler.apply(command);
+        return esMapper.domainToDto(esUserMono);
     }
 
     @SneakyThrows
