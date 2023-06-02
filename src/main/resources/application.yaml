@@ -8,6 +8,9 @@ logging:
     name: logs/application-info.log
 
 spring:
+  graphql:
+    graphiql:
+      enabled: true
   config:
     import: optional:file:.env[.properties]
   jackson:
