@@ -8,14 +8,14 @@ import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ExceptionResolver extends DataFetcherExceptionResolverAdapter {
+public class GraphqlExceptionResolver extends DataFetcherExceptionResolverAdapter {
 
     @Override
     protected GraphQLError resolveToSingleError(
             final Throwable ex, final DataFetchingEnvironment env
     ) {
         return GraphqlErrorBuilder.newError()
-                .errorType(ErrorType.NOT_FOUND)
+                .errorType(ErrorType.BAD_REQUEST)
                 .message(ex.getMessage())
                 .path(env.getExecutionStepInfo().getPath())
                 .location(env.getField().getSourceLocation())

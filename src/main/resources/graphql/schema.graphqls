@@ -12,8 +12,8 @@ type Query {
 }
 
 type Mutation {
- createUser(user: UserInput!): Es
- deleteUser(id: ID!): Es
+ createUser(user: UserInput!, commandBy: String!): Es
+ deleteUser(id: ID!, commandBy: String!): Es
 }
 
 type User {

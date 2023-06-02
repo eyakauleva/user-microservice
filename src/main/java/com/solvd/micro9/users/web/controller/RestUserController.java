@@ -32,10 +32,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -119,16 +120,22 @@ public class RestUserController {
     }
 
     @PostMapping
-    public Mono<EsDto> create(@RequestBody @Validated final UserDto userDto) {
+    public Mono<EsDto> create(
+            @RequestHeader("command_by") final String commandBy,
+            @RequestBody @Validated final UserDto userDto
+    ) {
         User user = userMapper.dtoToDomain(userDto);
-        CreateUserCommand command = new CreateUserCommand(user, "Liza123");
+        CreateUserCommand command = new CreateUserCommand(user, commandBy);
         Mono<EsUser> esUserMono = commandHandler.apply(command);
         return esMapper.domainToDto(esUserMono);
     }
 
     @DeleteMapping(value = "/{id}")
-    public Mono<EsDto> delete(@PathVariable("id") final String id) {
-        DeleteUserCommand command = new DeleteUserCommand(id, "Liza123");
+    public Mono<EsDto> delete(
+            @RequestHeader("command_by") final String commandBy,
+            @PathVariable("id") final String id
+    ) {
+        DeleteUserCommand command = new DeleteUserCommand(id, commandBy);
         Mono<EsUser> esUserMono = commandHandler.apply(command);
         return esMapper.domainToDto(esUserMono);
     }
