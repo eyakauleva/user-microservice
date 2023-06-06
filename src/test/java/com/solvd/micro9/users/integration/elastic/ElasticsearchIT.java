@@ -46,7 +46,7 @@ class ElasticsearchIT extends ElasticTestcontainers {
         List<ESearchUser> elstcUsers = TestUtils.getElstcUsers();
         elstcUsers.forEach(elstcUser ->
                 Mockito.when(userRepository.findById(elstcUser.getId()))
-                .thenReturn(Mono.just(TestUtils.convertToUser(elstcUser))));
+                        .thenReturn(Mono.just(TestUtils.convertToUser(elstcUser))));
         long appropriateUsersCount = 1;
         elstcRepository.saveAll(elstcUsers);
         Flux<User> userFlux = queryHandler.findByCriteria(criteria, pageable);
