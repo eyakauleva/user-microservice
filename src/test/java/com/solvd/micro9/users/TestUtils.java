@@ -8,10 +8,16 @@ import com.solvd.micro9.users.domain.elasticsearch.ESearchUser;
 import com.solvd.micro9.users.domain.elasticsearch.StudyYears;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 
 public final class TestUtils {
+
+    private static final DateTimeFormatter DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final LocalDateTime LOCAL_DATE_TIME =
+            LocalDateTime.parse("2023-06-01T12:30:25", DATE_FORMATTER);
 
     private TestUtils() {
     }
@@ -25,20 +31,27 @@ public final class TestUtils {
     public static ESearchUser getElstcUser() {
         return new ESearchUser("1111", "Liza Ya", "+12345",
                 20, Gender.FEMALE, 170.5f, 50.2f, EyesColor.BLUE,
-                new StudyYears(2015, 2018), LocalDateTime.now());
+                new StudyYears(2015, 2018), LOCAL_DATE_TIME);
     }
 
     public static List<ESearchUser> getElstcUsers() {
         ESearchUser user1 = new ESearchUser("111", "Liza Ya", "+12345",
                 20, Gender.FEMALE, 170.5f, 57.2f, EyesColor.BLUE,
-                new StudyYears(2019, 2024), LocalDateTime.now());
+                new StudyYears(2019, 2024), LOCAL_DATE_TIME);
         ESearchUser user2 = new ESearchUser("234", "Ivan Ivanov", "+8928912",
                 36, Gender.MALE, 192.4f, 96.2f, EyesColor.GREEN,
-                new StudyYears(2010, 2014), LocalDateTime.now());
+                new StudyYears(2010, 2014), LOCAL_DATE_TIME);
         ESearchUser user3 = new ESearchUser("43436", "Petr Petrov", "+35232",
                 27, Gender.UNSET, 179.0f, 85.1f, EyesColor.UNSET,
-                new StudyYears(2012, 2016), LocalDateTime.now());
+                new StudyYears(2012, 2016), LOCAL_DATE_TIME);
         return List.of(user1, user2, user3);
+    }
+
+    public static UserCriteria getUserCriteria() {
+        return new UserCriteria("a", null, 20,
+                170f, 190f, 55f, 70f,
+                Set.of(Gender.MALE, Gender.FEMALE),
+                Set.of(EyesColor.BLUE, EyesColor.UNSET), 2020);
     }
 
     public static User convertToUser(final ESearchUser user) {
@@ -47,13 +60,6 @@ public final class TestUtils {
                 user.getPhone(), user.getAge(), user.getGender(), user.getHeight(),
                 user.getWeight(), user.getEyesColor(), user.getStudyYears().getGte(),
                 user.getStudyYears().getLte(), false);
-    }
-
-    public static UserCriteria getUserCriteria() {
-        return new UserCriteria("a", null, 20,
-                170f, 190f, 55f, 70f,
-                Set.of(Gender.MALE, Gender.FEMALE),
-                Set.of(EyesColor.BLUE, EyesColor.UNSET), 2020);
     }
 
 }
