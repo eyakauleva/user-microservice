@@ -19,9 +19,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -43,15 +43,29 @@ class ElasticsearchIT extends ElasticTestcontainers {
     void verifyElasticsearchUsersAreFoundByCriteria() {
         UserCriteria criteria = TestUtils.getUserCriteria();
         Pageable pageable = PageRequest.of(0, 10);
-        List<ESearchUser> elstcUsers = TestUtils.getElstcUsers();
-        elstcUsers.forEach(elstcUser ->
-                Mockito.when(userRepository.findById(elstcUser.getId()))
-                        .thenReturn(Mono.just(TestUtils.convertToUser(elstcUser))));
-        long appropriateUsersCount = 1;
-        elstcRepository.saveAll(elstcUsers);
+        List<ESearchUser> eSearchUsers = TestUtils.getElstcUsers();
+        List<String> ids = new ArrayList<>();
+        List<Flux<User>> usersFluxList = new ArrayList<>(List.of(Flux.empty()));
+        List<Long> appropriateUsersCountList = new ArrayList<>(List.of(0L));
+        eSearchUsers.stream()
+                .filter(eSearchUser ->
+                        TestUtils.doesESearchUserSatisfyCriteria(eSearchUser, criteria))
+                .forEach(eSearchUser -> {
+                    ids.add(eSearchUser.getId());
+                    usersFluxList.set(
+                            0,
+                            Flux.concat(
+                                    usersFluxList.get(0),
+                                    Flux.just(TestUtils.convertToUser(eSearchUser))
+                            )
+                    );
+                    appropriateUsersCountList.set(0, appropriateUsersCountList.get(0) + 1);
+                });
+        Mockito.when(userRepository.findAllById(ids)).thenReturn(usersFluxList.get(0));
+        elstcRepository.saveAll(eSearchUsers);
         Flux<User> userFlux = queryHandler.findByCriteria(criteria, pageable);
         StepVerifier.create(userFlux)
-                .expectNextCount(appropriateUsersCount)
+                .expectNextCount(appropriateUsersCountList.get(0))
                 .verifyComplete();
         StepVerifier.create(userFlux)
                 .thenConsumeWhile(user -> {

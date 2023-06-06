@@ -18,6 +18,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -40,9 +42,11 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
     @Override
     public Flux<User> getAll() {
         if (areAllUsersInCache) {
+            log.info("All users were retrieved from cache");
             return cache.entries(RedisConfig.CACHE_KEY)
                     .map(Map.Entry::getValue);
         } else {
+            log.info("All users were retrieved from db");
             areAllUsersInCache = true;
             return userRepository.findAll()
                     .doOnNext(user -> cache.put(RedisConfig.CACHE_KEY, user.getId(), user)
@@ -55,9 +59,12 @@ public class UserQueryHandlerImpl implements UserQueryHandler {
     public Flux<User> findByCriteria(final UserCriteria criteria,
                                      final Pageable pageable) {
         return elasticFilter.doFilter(criteria, pageable)
-                .flatMap(elstcUser -> this.findById(
-                        new EsUserQuery(elstcUser.getId()))
-                );
+                .collectList()
+                .flatMapMany(eSearchUsers -> {
+                    List<String> ids = new ArrayList<>();
+                    eSearchUsers.forEach(eSearchUser -> ids.add(eSearchUser.getId()));
+                    return userRepository.findAllById(ids);
+                });
     }
 
     @Override

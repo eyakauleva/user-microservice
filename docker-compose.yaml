@@ -120,6 +120,7 @@ services:
     volumes:
       - ./src/infra/docker-elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
       - ./src/infra/docker-elk/logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
+      - ./logs:/usr/share/logstash/app-logs
     ports:
       - 5044:5044
       - 50000:50000/tcp
@@ -127,7 +128,8 @@ services:
       - 9600:9600
     environment:
       LS_JAVA_OPTS: -Xms256m -Xmx256m
-      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+      ELASTIC_USER: ${ELASTIC_USER:-}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
     depends_on:
       - elasticsearch
 
@@ -174,8 +176,29 @@ services:
       CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
       CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
 
+  grafana:
+    image: grafana/grafana:9.5.2
+    container_name: grafana
+    ports:
+      - 3000:3000
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+
+  prometheus:
+    image: prom/prometheus:v2.44.0
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./src/infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
 volumes:
   cache:
   mongodb:
   setup:
   elasticsearch:
+  prometheus:
