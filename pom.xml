@@ -32,6 +32,7 @@
         <elasticsearch.version>5.1.0</elasticsearch.version>
         <prometheus.version>1.11.0</prometheus.version>
         <graphql.validation.version>20.0</graphql.validation.version>
+        <graphql.test>1.2.0</graphql.test>
     </properties>
 
     <dependencies>
@@ -165,6 +166,12 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.graphql</groupId>
+            <artifactId>spring-graphql-test</artifactId>
+            <version>${graphql.test}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
