@@ -6,6 +6,9 @@ import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.criteria.UserCriteria;
 import com.solvd.micro9.users.domain.elasticsearch.ESearchUser;
 import com.solvd.micro9.users.domain.elasticsearch.StudyYears;
+import com.solvd.micro9.users.domain.es.EsStatus;
+import com.solvd.micro9.users.domain.es.EsType;
+import com.solvd.micro9.users.domain.es.EsUser;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,6 +32,16 @@ public final class TestUtils {
         return new User("111", "Liza", "Ya", "email@gmail.com",
                 "+12345", 20, Gender.FEMALE, 170.5f,
                 50.2f, EyesColor.BLUE, 2010, 2015, false);
+    }
+
+    public static EsUser getEsUserCreated() {
+        return new EsUser(1L, EsType.USER_CREATED, LocalDateTime.now(),
+                "Liza", "14121", "", EsStatus.SUBMITTED);
+    }
+
+    public static EsUser getEsUserDeleted() {
+        return new EsUser(1L, EsType.USER_DELETED, LocalDateTime.now(),
+                "Liza", "14121", "", EsStatus.PENDING);
     }
 
     public static ESearchUser getElstcUser() {
