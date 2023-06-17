@@ -1,6 +1,7 @@
 package com.solvd.micro9.users.integration.kafka;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.elasticsearch.ESearchUser;
@@ -27,10 +28,13 @@ class UserProducerIT extends KafkaTestcontainers {
     private static final String TOPIC = "syncMongoElastic";
 
     @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private UserProducer producer;
 
     @Test
-    void verifyMessageSentToKafkaTest() {
+    void verifyMessageSentToKafkaTest() throws JsonProcessingException {
         ESearchUser user = TestUtils.getElstcUser();
         try (Consumer<String, ESearchUser> consumer = new KafkaConsumer<>(
                 getConsumerProps(User.class)
@@ -40,7 +44,7 @@ class UserProducerIT extends KafkaTestcontainers {
             ConsumerRecords<String, ESearchUser> records =
                     consumer.poll(Duration.ofSeconds(5));
             ConsumerRecord<String, ESearchUser> record = records.iterator().next();
-            ESearchUser result = new Gson().fromJson(
+            ESearchUser result = objectMapper.readValue(
                     String.valueOf(record.value()), ESearchUser.class
             );
             Assertions.assertEquals(1, records.count());
