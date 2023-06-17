@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 @GraphQlTest(GraphqlUserController.class)
-@Import(GraphQLITConfig.class)
-public class GraphQLIT {
+@Import(GraphqlUserControllerITConfig.class)
+public class GraphqlUserControllerIT {
 
     @Autowired
     private GraphQlTester tester;
@@ -39,8 +39,8 @@ public class GraphQLIT {
     @Test
     void verifyUsersAreFondByCriteriaTest() {
         int size = 10;
-        String query = "{ findByCriteria (criteria: {name: \"a\"}, size: " + size
-                + ", page: 0) { id firstName lastName email phone } }";
+        String query = String.format("{ findByCriteria (criteria: {name: \"a\"}, "
+                + "size: %d, page: 0) { id firstName lastName email phone } }", size);
         List<User> result = this.tester.document(query)
                 .execute()
                 .path("data.findByCriteria[*]")

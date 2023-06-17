@@ -1,11 +1,11 @@
 package com.solvd.micro9.users.integration.kafka;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.solvd.micro9.users.TestUtils;
 import com.solvd.micro9.users.domain.aggregate.User;
 import com.solvd.micro9.users.domain.elasticsearch.ESearchUser;
 import com.solvd.micro9.users.messaging.UserProducer;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -34,8 +34,7 @@ class UserProducerIT extends KafkaTestcontainers {
     private UserProducer producer;
 
     @Test
-    @SneakyThrows
-    void verifyMessageSentToKafkaTest() {
+    void verifyMessageSentToKafkaTest() throws JsonProcessingException {
         ESearchUser user = TestUtils.getElstcUser();
         try (Consumer<String, ESearchUser> consumer = new KafkaConsumer<>(
                 getConsumerProps(User.class)

@@ -30,7 +30,7 @@ import java.time.format.DateTimeFormatter;
 @TestConfiguration
 @EnableAutoConfiguration
 @Import({WebConfig.class, LocalDateTimeToStringCoercing.class})
-public class GraphQLITConfig {
+public class GraphqlUserControllerITConfig {
 
     @Bean
     public UserQueryHandler queryHandler() {
