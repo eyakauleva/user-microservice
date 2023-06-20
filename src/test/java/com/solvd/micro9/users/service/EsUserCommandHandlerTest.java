@@ -54,7 +54,7 @@ class EsUserCommandHandlerTest {
     }
 
     @Test
-    void verifyCreateUserCommandIsAppliedTest() {
+    void verifyCreateUserCommandIsApplied() {
         User user = TestUtils.getUser();
         CreateUserCommand command = new CreateUserCommand(user, "Liza");
         String payload = new Gson().toJson(command.getUser());
@@ -89,7 +89,7 @@ class EsUserCommandHandlerTest {
     }
 
     @Test
-    void verifyDeleteUserCommandIsAppliedTest() {
+    void verifyDeleteUserCommandIsApplied() {
         DeleteUserCommand command = new DeleteUserCommand("111", "Liza");
         EsUser createdEvent = EsUser.builder()
                 .id(999L)
@@ -110,7 +110,7 @@ class EsUserCommandHandlerTest {
     }
 
     @Test
-    void verifyCompleteTransactionCommandIsAppliedTest() {
+    void verifyCompleteTransactionCommandIsApplied() {
         CompleteTransactionCommand command =
                 new CompleteTransactionCommand("12345", EsStatus.SUBMITTED);
         EsUser event = EsUser.builder()

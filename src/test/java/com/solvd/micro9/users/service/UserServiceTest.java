@@ -34,7 +34,7 @@ class UserServiceTest {
     private UserServiceImpl userService;
 
     @Test
-    void verifyUserIsCreatedTest() {
+    void verifyUserIsCreated() {
         User user = TestUtils.getUser();
         user.setNew(true);
         User savedUser = TestUtils.getUser();

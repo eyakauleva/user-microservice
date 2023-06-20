@@ -1,0 +1,4 @@
+type Mutation {
+ createUser(user: UserInput!, commandBy: String!): Es
+ deleteUser(id: ID!, commandBy: String!): Es
+}

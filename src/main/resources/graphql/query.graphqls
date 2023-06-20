@@ -1,0 +1,5 @@
+type Query {
+ getAllUsers: [User]
+ findUserById(userId: ID!): User
+ findByCriteria(criteria: CriteriaInput!, size: Int! @Min(value: 1), page: Int! @Min): [User]
+}

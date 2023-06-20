@@ -1,0 +1,26 @@
+input UserInput {
+ firstName: String! @NotBlank
+ lastName: String! @NotBlank
+ email: String! @NotBlank
+ phone: String! @NotBlank
+ age: Int
+ gender: Gender
+ height: Float
+ weight: Float
+ eyesColor: EyesColor
+ startStudyYear: Int
+ endStudyYear: Int
+}
+
+input CriteriaInput {
+ name: String
+ phone: String
+ age: Int
+ heightFrom: Float
+ heightTo: Float
+ weightFrom: Float
+ weightTo: Float
+ genders: [Gender]
+ eyesColors: [EyesColor]
+ studyYear: Int
+}
