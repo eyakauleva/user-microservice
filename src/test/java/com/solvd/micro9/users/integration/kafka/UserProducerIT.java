@@ -34,7 +34,7 @@ class UserProducerIT extends KafkaTestcontainers {
     private UserProducer producer;
 
     @Test
-    void verifyMessageSentToKafkaTest() throws JsonProcessingException {
+    void verifyMessageIsSentToKafka() throws JsonProcessingException {
         ESearchUser user = TestUtils.getElstcUser();
         try (Consumer<String, ESearchUser> consumer = new KafkaConsumer<>(
                 getConsumerProps(User.class)

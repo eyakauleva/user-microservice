@@ -25,7 +25,7 @@ public class GraphqlUserControllerIT {
     private GraphQlTester tester;
 
     @Test
-    void verifyAllUsersAreFoundTest() {
+    void verifyAllUsersAreFound() {
         String query = "{ getAllUsers { id firstName lastName email phone } }";
         List<User> result = this.tester.document(query)
                 .execute()
@@ -37,7 +37,7 @@ public class GraphqlUserControllerIT {
     }
 
     @Test
-    void verifyUsersAreFondByCriteriaTest() {
+    void verifyUsersAreFondByCriteria() {
         int size = 10;
         String query = String.format("{ findByCriteria (criteria: {name: \"a\"}, "
                 + "size: %d, page: 0) { id firstName lastName email phone } }", size);
@@ -52,7 +52,7 @@ public class GraphqlUserControllerIT {
     }
 
     @Test
-    void verifyUserIsFoundByIdTest() {
+    void verifyUserIsFoundById() {
         String userId = TestUtils.getUser().getId();
         String query = "{ findUserById (userId: " + userId + ") { id } }";
         User result = this.tester.document(query)
@@ -65,7 +65,7 @@ public class GraphqlUserControllerIT {
     }
 
     @Test
-    void verifyUserIsNotFoundByIdTest() {
+    void verifyUserIsNotFoundById() {
         String userId = "55555";
         String query = "{ findUserById (userId: " + userId + ") { id } }";
         GraphQlTester.Errors errors = this.tester.document(query)
@@ -76,7 +76,7 @@ public class GraphqlUserControllerIT {
     }
 
     @Test
-    void verifyUserIsCreatedTest() {
+    void verifyUserIsCreated() {
         String query = "mutation { createUser (user: { firstName: \"a\" lastName: \"a\" "
                 + "email: \"a\" phone: \"555\" }, commandBy: \"Liza\" ) "
                 + "{ id type time status createdBy entityId } }";
@@ -95,7 +95,7 @@ public class GraphqlUserControllerIT {
     }
 
     @Test
-    void verifyUserIsDeletedTest() {
+    void verifyUserIsDeleted() {
         String query = "mutation { deleteUser(id: \"1234\", commandBy: \"Liza\" ) "
                 + "{ id type time status createdBy entityId } }";
         EsUser result = this.tester.document(query)
