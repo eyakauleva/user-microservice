@@ -50,7 +50,7 @@ class UserQueryHandlerTest {
     }
 
     @Test
-    void verifyAllExistingUsersAreFoundInDbTest() {
+    void verifyAllExistingUsersAreFoundInDb() {
         User user = TestUtils.getUser();
         Flux<User> allUsers = Flux.just(user);
         Mockito.when(userRepository.findAll()).thenReturn(allUsers);
@@ -63,7 +63,7 @@ class UserQueryHandlerTest {
     }
 
     @Test
-    void verifyAllExistingUsersAreFoundInCacheTest() {
+    void verifyAllExistingUsersAreFoundInCache() {
         User user = TestUtils.getUser();
         Map.Entry<String, User> allUsersEntry = new AbstractMap.SimpleEntry<>(
                 "test", user
@@ -101,7 +101,7 @@ class UserQueryHandlerTest {
     }
 
     @Test
-    void verifyUserIsFoundByIdFromDbTest() {
+    void verifyUserIsFoundByIdFromDb() {
         User user = TestUtils.getUser();
         EsUserQuery query = new EsUserQuery(user.getId());
         Mockito.when(userRepository.findById(user.getId())).thenReturn(Mono.just(user));
@@ -116,7 +116,7 @@ class UserQueryHandlerTest {
     }
 
     @Test
-    void verifyUserIsFoundByIdFromCacheTest() {
+    void verifyUserIsFoundByIdFromCache() {
         User user = TestUtils.getUser();
         EsUserQuery query = new EsUserQuery(user.getId());
         Mockito.when(cache.get(RedisConfig.CACHE_KEY, query.getId()))
@@ -128,7 +128,7 @@ class UserQueryHandlerTest {
     }
 
     @Test
-    void verifyUserIsNotFoundByIdTest() {
+    void verifyUserIsNotFoundById() {
         String userId = "1111";
         EsUserQuery query = new EsUserQuery(userId);
         Mockito.when(userRepository.findById(userId)).thenReturn(Mono.empty());

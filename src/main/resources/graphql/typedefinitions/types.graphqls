@@ -1,0 +1,24 @@
+type User {
+ id: ID
+ firstName: String!
+ lastName: String!
+ email: String!
+ phone: String!
+ age: Int
+ gender: Gender
+ height: Float
+ weight: Float
+ eyesColor: EyesColor
+ startStudyYear: Int
+ endStudyYear: Int
+}
+
+type Es {
+ id: ID
+ type: String
+ time: LocalDateTime
+ createdBy: String
+ entityId: String
+ payload: String
+ status: String
+}

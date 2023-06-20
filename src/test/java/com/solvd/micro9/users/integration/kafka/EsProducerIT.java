@@ -41,7 +41,7 @@ class EsProducerIT extends KafkaTestcontainers {
 
     @Test
     @SneakyThrows
-    void verifyMessageSentToKafkaTest() {
+    void verifyMessageIsSentToKafka() {
         User user = TestUtils.getUser();
         String payload = new Gson().toJson(user);
         Es event = EsUser.builder()
